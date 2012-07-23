@@ -55,6 +55,7 @@ obj-$(CONFIG_MACH_VENTURI)	+= aries-watchdog.o
 obj-$(CONFIG_MACH_VENTURI)	+= aries-panel.o
 obj-$(CONFIG_MACH_VENTURI)	+= sec_switch.o
 obj-$(CONFIG_MACH_VENTURI)	+= sec_jack.o
+obj-$(CONFIG_FORCE_FAST_CHARGE)         += fastchg.o
 
 # device support
 
