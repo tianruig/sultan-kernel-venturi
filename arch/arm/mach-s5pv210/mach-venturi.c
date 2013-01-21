@@ -1143,7 +1143,7 @@ static struct spi_board_info spi_board_info[] __initdata = {
 	{
 		.modalias	= "tl2796",
 		.platform_data	= &aries_panel_data,
-		.max_speed_hz	= 1200000,
+		.max_speed_hz	= 1520000,
 		.bus_num	= LCD_BUS_NUM,
 		.chip_select	= 0,
 		.mode		= SPI_MODE_3,
@@ -1221,7 +1221,7 @@ static struct spi_board_info spi_board_info[] __initdata = {
 	{
 		.modalias	= "hx8369",
 		.platform_data	= &aries_panel_data,
-		.max_speed_hz	= 1200000,
+		.max_speed_hz	= 1520000,
 		.bus_num	= LCD_BUS_NUM,
 		.chip_select	= 0,
 		.mode		= SPI_MODE_3,
@@ -3835,9 +3835,21 @@ static void __init android_pmem_set_platdata(void)
 #ifdef CONFIG_CPU_FREQ
 static struct s5pv210_cpufreq_voltage smdkc110_cpufreq_volt[] = {
 	{
+ 		.freq	= 1520000,
+		.varm	= 1325000,
+ 		.vint	= 1135000,
+ 	}, {
+ 		.freq	= 1320000,
+		.varm	= 1310000,
+ 		.vint	= 1130000,
+ 	}, {
  		.freq	= 1200000,
-		.varm	= 1275000,
- 		.vint	= 1100000,
+		.varm	= 1300000,
+ 		.vint	= 1125000,
+ 	}, {
+ 		.freq	= 1096000,
+		.varm	= 1285000,
+ 		.vint	= 1120000,
  	}, {
 		.freq	= 1000000,
 		.varm	= 1275000,
