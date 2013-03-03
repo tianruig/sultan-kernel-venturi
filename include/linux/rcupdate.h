@@ -156,6 +156,8 @@ static inline void rcu_exit_nohz(void)
 #include <linux/rcutree.h>
 #elif defined(CONFIG_TINY_RCU) || defined(CONFIG_TINY_PREEMPT_RCU)
 #include <linux/rcutiny.h>
+#elif defined(CONFIG_JRCU)
+#include <linux/jrcu.h>
 #else
 #error "Unknown RCU implementation specified to kernel configuration"
 #endif
@@ -716,6 +718,12 @@ static inline notrace void rcu_read_unlock_sched_notrace(void)
 #define RCU_INIT_POINTER(p, v) \
 		p = (typeof(*v) __force __rcu *)(v)
 
+#define rcu_assign_pointer_nonull(p, v) \
+	({ \
+		if (!__builtin_constant_p(v)) \
+			smp_wmb(); \
+		(p) = (v); \
+	})
 /* Infrastructure to implement the synchronize_() primitives. */
 
 struct rcu_synchronize {
