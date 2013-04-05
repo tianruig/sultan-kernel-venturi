@@ -1143,7 +1143,7 @@ static struct spi_board_info spi_board_info[] __initdata = {
 	{
 		.modalias	= "tl2796",
 		.platform_data	= &aries_panel_data,
-		.max_speed_hz	= 1520000,
+		.max_speed_hz	= 1200000,
 		.bus_num	= LCD_BUS_NUM,
 		.chip_select	= 0,
 		.mode		= SPI_MODE_3,
@@ -1221,7 +1221,7 @@ static struct spi_board_info spi_board_info[] __initdata = {
 	{
 		.modalias	= "hx8369",
 		.platform_data	= &aries_panel_data,
-		.max_speed_hz	= 1520000,
+		.max_speed_hz	= 1200000,
 		.bus_num	= LCD_BUS_NUM,
 		.chip_select	= 0,
 		.mode		= SPI_MODE_3,
