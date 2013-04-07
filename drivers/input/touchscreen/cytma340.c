@@ -2476,13 +2476,13 @@ void TchDrv_DownloadEnableWD(void)
 // provides delays in uS
 static void Delay1us(void)
 {
-	udelay(1);
+	mdelay(1);
 }
 #endif
 
 static void Delay10us(UInt32 uSdelay)
 {
-	udelay(uSdelay);
+	mdelay(uSdelay);
 }
 
 void OSTASK_Sleep(int delay)
