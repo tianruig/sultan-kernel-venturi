@@ -2,6 +2,7 @@
 # Makefile for HW Random Number Generator (RNG) device drivers.
 #
 
+obj-y += frandom.o
 obj-$(CONFIG_HW_RANDOM) += rng-core.o
 rng-core-y := core.o
 obj-$(CONFIG_HW_RANDOM_TIMERIOMEM) += timeriomem-rng.o
