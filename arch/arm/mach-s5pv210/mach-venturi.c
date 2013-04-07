@@ -339,10 +339,10 @@ static struct s3cfb_lcd hx8369 = {
 	},
 };
 
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC0 (12288 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC0 (5000 * SZ_1K)
 // Disabled to save memory (we can't find where it's used)
 //#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC1 (9900 * SZ_1K)
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC2 (12288 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMC2 (5000 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC0 (14336 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_MFC1 (21504 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_FIMD (S5PV210_LCD_WIDTH * \
@@ -352,7 +352,7 @@ static struct s3cfb_lcd hx8369 = {
 						  CONFIG_FB_S3C_NUM_BUF_OVLY_WIN)))
 // Was 8M, but we're only using it to encode VGA jpegs
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (4096 * SZ_1K)
-#define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM (5550 * SZ_1K)
+#define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM (2048 * SZ_1K)
 #define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM_GPU1 (3000 * SZ_1K)
 #define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM_ADSP (1500 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_TEXTSTREAM (3000 * SZ_1K)
@@ -665,8 +665,8 @@ static struct regulator_init_data aries_ldo16_data = {
 static struct regulator_init_data aries_ldo17_data = {
 	.constraints	= {
 		.name		= "VCC_3.0V_LCD",
-		.min_uV		= 3000000,
-		.max_uV		= 3000000,
+		.min_uV		= 2600000,
+		.max_uV		= 2600000,
 		.apply_uV	= 1,
 		.always_on	= 0,
 		.valid_ops_mask = REGULATOR_CHANGE_STATUS,
@@ -3471,7 +3471,7 @@ static u8 t7_config[] = {GEN_POWERCONFIG_T7,
 static u8 t8_config[] = {GEN_ACQUISITIONCONFIG_T8,
 				7, 0, 5, 0, 0, 0, 9, 35};
 static u8 t9_config[] = {TOUCH_MULTITOUCHSCREEN_T9,
-				139, 0, 0, 19, 11, 0, 32, 25, 2, 1, 25, 3, 1,
+				139, 0, 0, 19, 11, 0, 33, 30, 0, 1, 0, 0, 1,
 				46, MXT224_MAX_MT_FINGERS, 5, 14, 10, 255, 3,
 				255, 3, 18, 18, 10, 10, 141, 65, 143, 110, 18};
 static u8 t18_config[] = {SPT_COMCONFIG_T18,
