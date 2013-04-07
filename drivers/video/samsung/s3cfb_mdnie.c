@@ -558,7 +558,7 @@ static ssize_t mdnieset_ui_file_cmd_show(struct device *dev,
 {
 	int mdnie_ui = 0;
 
-	gprintk("called %s \n",__func__);
+	pr_info("called %s \n",__func__);
 
 	switch(current_mDNIe_UI)
 	{
