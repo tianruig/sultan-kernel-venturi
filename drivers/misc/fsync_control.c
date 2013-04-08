@@ -14,7 +14,7 @@
 
 #define FSYNCCONTROL_VERSION 1
 
-bool fsynccontrol_fsync_enabled = true;
+bool fsynccontrol_fsync_enabled = false;
 
 static ssize_t fsynccontrol_status_read(struct device * dev, struct device_attribute * attr, char * buf)
 {
