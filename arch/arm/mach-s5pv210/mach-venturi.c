@@ -3584,7 +3584,7 @@ static void fsa9480_usb_cb(bool attached)
 
 static void fsa9480_charger_cb(bool attached)
 {
-	set_cable_status = attached ? CABLE_TYPE_MISC : CABLE_TYPE_NONE;
+	set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
 	if (charger_callbacks && charger_callbacks->set_cable)
 		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 }
@@ -3611,7 +3611,7 @@ static void fsa9480_deskdock_cb(bool attached)
 
 	mtp_off_status = false;
 
-	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
+	set_cable_status = attached ? CABLE_TYPE_MISC : CABLE_TYPE_NONE;
 	if (charger_callbacks && charger_callbacks->set_cable)
 		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 }
