@@ -47,7 +47,8 @@ obj-$(CONFIG_PHONE_ARIES_CDMA)	+= dev-s1-phone.o
 obj-$(CONFIG_PHONE_ARIES_CDMA)	+= level.o
 obj-$(CONFIG_PHONE_CRESPO)	+= dev-aries-phone.o
 
-obj-$(CONFIG_MACH_VENTURI)	+= mach-venturi.o
+obj-$(CONFIG_MACH_VENTURI)	+= mach-venturi.o aries-rfkill.o
+obj-$(CONFIG_MACH_VENTURI)	+= aries-btlpm.o
 obj-$(CONFIG_MACH_VENTURI)	+= aries-watchdog.o
 obj-$(CONFIG_MACH_VENTURI)	+= aries-panel.o
 obj-$(CONFIG_MACH_VENTURI)	+= sec_switch.o
