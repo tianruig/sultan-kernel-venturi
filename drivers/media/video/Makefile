@@ -2,6 +2,8 @@
 # Makefile for the video capture/playback device drivers.
 #
 
+ccflags-y := -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mvectorize-with-neon-double
+
 tuner-objs	:=	tuner-core.o
 
 msp3400-objs	:=	msp3400-driver.o msp3400-kthreads.o
