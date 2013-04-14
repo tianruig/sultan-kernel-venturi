@@ -4,7 +4,7 @@ MAKE="200"
 ## Set compiler location
 echo Setting compiler location...
 export ARCH=arm
-export CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.7.3-2013.03/bin/arm-cortex_a8-linux-gnueabi-
+export CROSS_COMPILE=/home/sultan/Downloads/arm-cortex_a8-linux-gnueabi-linaro_4.7.3-2013.04/bin/arm-cortex_a8-linux-gnueabi-
 
 ## Build Sultan kernel
 make -j$MAKE ARCH=arm
