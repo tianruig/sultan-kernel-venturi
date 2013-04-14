@@ -282,7 +282,7 @@ static int fimc_camera_start(struct fimc_control *ctrl)
 			ctrl->cam->width = cam_frmsize.discrete.width;
 			ctrl->cam->height = cam_frmsize.discrete.height;
 			dev_err(ctrl->dev, "%s, crop(368x480), vtmode = 0, device = front, cam->width = %d, cam->height = %d\n", __func__, ctrl->cam->width, ctrl->cam->height);
-		} */else {
+		}*/ else {
 			ctrl->cam->window.left = 0;
 			ctrl->cam->window.top = 0;
 			ctrl->cam->window.width = ctrl->cam->width;
@@ -1607,7 +1607,7 @@ int fimc_streamon_capture(void *fh)
 			ctrl->cam->width = cam_frmsize.discrete.width;
 			ctrl->cam->height =cam_frmsize.discrete.height;
 			dev_err(ctrl->dev, "%s, crop(368x480), vtmode = 0, device = front, cam->width = %d, cam->height = %d\n", __func__, ctrl->cam->width, ctrl->cam->height);
-		} */else {
+		}*/ else {
 			ctrl->cam->window.left = 0;
 			ctrl->cam->window.top = 0;
 			ctrl->cam->width = ctrl->cam->window.width = cam_frmsize.discrete.width;
@@ -1649,10 +1649,10 @@ int fimc_streamon_capture(void *fh)
 
 		fimc_hwset_output_size(ctrl, cap->fmt.width, cap->fmt.height);
 
-		if ((device_id != 0) && (vtmode != 1)) {
+		/*if ((device_id != 0) && (vtmode != 1)) {
 			ctrl->cap->rotate = 90;
 			dev_err(ctrl->dev, "%s, rotate 90", __func__);
-		}
+		}*/
 
 		fimc_hwset_output_scan(ctrl, &cap->fmt);
 		fimc_hwset_output_rot_flip(ctrl, cap->rotate, cap->flip);
