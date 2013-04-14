@@ -21,12 +21,13 @@ load_len=$boot_len
 
 mount -t ext4 /dev/block/mmcblk0p15 /cache
 
-if test -e /cache/.startrecovery ; then
-	# recovery boot
+if test -e /cache/.startrecovery || grep -q bootmode=2 /proc/cmdline ; then
+	# recovery boot and dd if a normally-booting param.blk to mmcblk0p9
+	tar -zxvf /stage1/normalboot.tar.gz
+	dd if=/bootnormally.img of=/dev/block/mmcblk0p9
 	rm -fr /cache/.startrecovery
 	load_offset=$recovery_offset
 	load_len=$recovery_len
-
 	# disable lpm
 	echo 0 > /sys/class/power_supply/battery/charging_mode_booting
 fi
