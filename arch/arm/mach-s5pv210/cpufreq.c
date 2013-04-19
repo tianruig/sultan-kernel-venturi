@@ -488,6 +488,15 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 		case OC1:
 			__raw_writel(APLL_VAL_1320, S5P_APLL_CON);
 			break;
+		case OC2:
+			__raw_writel(APLL_VAL_1200, S5P_APLL_CON);
+			break;
+		case OC3:
+			__raw_writel(APLL_VAL_1096, S5P_APLL_CON);
+			break;
+		case L0:
+			__raw_writel(APLL_VAL_1000, S5P_APLL_CON);
+			break;
 		default:
 			__raw_writel(APLL_VAL_800, S5P_APLL_CON);
 			break;
