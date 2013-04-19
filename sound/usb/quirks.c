@@ -424,6 +424,34 @@ static int snd_usb_accessmusic_boot_quirk(struct usb_device *dev)
 }
 
 /*
+ * Some sound cards from Native Instruments are in fact compliant to the USB
+ * audio standard of version 2 and other approved USB standards, even though
+ * they come up as vendor-specific device when first connected.
+ *
+ * However, they can be told to come up with a new set of descriptors
+ * upon their next enumeration, and the interfaces announced by the new
+ * descriptors will then be handled by the kernel's class drivers. As the
+ * product ID will also change, no further checks are required.
+ */
+
+static int snd_usb_nativeinstruments_boot_quirk(struct usb_device *dev)
+{
+	int ret = usb_control_msg(dev, usb_sndctrlpipe(dev, 0),
+				  0xaf, USB_TYPE_VENDOR | USB_RECIP_DEVICE,
+				  1, 0, NULL, 0, 1000);
+
+	if (ret < 0)
+		return ret;
+
+	usb_reset_device(dev);
+
+	/* return -EAGAIN, so the creation of an audio interface for this
+	 * temporary device is aborted. The device will reconnect with a
+	 * new product ID */
+	return -EAGAIN;
+}
+
+/*
  * Setup quirks
  */
 #define AUDIOPHILE_SET			0x01 /* if set, parse device_setup */
