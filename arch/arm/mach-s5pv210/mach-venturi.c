@@ -3834,14 +3834,14 @@ static void __init android_pmem_set_platdata(void)
 static struct s5pv210_cpufreq_voltage smdkc110_cpufreq_volt[] = {
 	{
  		.freq	= 1700000,
-		.varm	= 1450000,
+		.varm	= 1475000,
  		.vint	= 1225000,
  	}, {
  		.freq	= 1600000,
-		.varm	= 1400000,
+		.varm	= 1425000,
  		.vint	= 1200000,
  	}, {
- 		.freq	= 1500000,
+ 		.freq	= 1520000,
 		.varm	= 1400000,
  		.vint	= 1200000,
  	}, {
@@ -3853,7 +3853,7 @@ static struct s5pv210_cpufreq_voltage smdkc110_cpufreq_volt[] = {
 		.varm	= 1350000,
  		.vint	= 1125000,
  	}, {
- 		.freq	= 1300000,
+ 		.freq	= 1320000,
 		.varm	= 1300000,
  		.vint	= 1125000,
  	}, {
