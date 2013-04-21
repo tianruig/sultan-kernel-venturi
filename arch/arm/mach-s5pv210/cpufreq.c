@@ -116,8 +116,8 @@ const unsigned long int_volt_max = 1250000;
 
 static struct s5pv210_dvs_conf dvs_conf[] = {
 	[OC0] = {
-		.arm_volt   = 1475000,
-		.int_volt   = 1225000,
+		.arm_volt   = 1500000,
+		.int_volt   = 1250000,
 	},
 	[OC1] = {
 		.arm_volt   = 1425000,
