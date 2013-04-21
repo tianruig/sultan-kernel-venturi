@@ -33,12 +33,16 @@ static struct cpufreq_freqs freqs;
 static DEFINE_MUTEX(set_freq_lock);
 
 /* APLL M,P,S values for 1.2G/1G/800Mhz */
-#define APLL_VAL_1520   ((1 << 31) | (180 << 16) | (3 << 8) | 1) 
-#define APLL_VAL_1440   ((1 << 31) | (175 << 16) | (3 << 8) | 1) 
-#define APLL_VAL_1200	((1 << 31) | (150 << 16) | (3 << 8) | 1)
-#define APLL_VAL_1096   ((1 << 31) | (137 << 16) | (3 << 8) | 1)
-#define APLL_VAL_1000	((1 << 31) | (125 << 16) | (3 << 8) | 1)
-#define APLL_VAL_800	((1 << 31) | (100 << 16) | (3 << 8) | 1)
+#define APLL_VAL_1700   ((1<<31)|(425<<16)|(6<<8)|(1))
+#define APLL_VAL_1600   ((1<<31)|(200<<16)|(3<<8)|(1))
+#define APLL_VAL_1540   ((1<<31)|(385<<16)|(6<<8)|(1))
+#define APLL_VAL_1500   ((1<<31)|(375<<16)|(6<<8)|(1))
+#define APLL_VAL_1440   ((1<<31)|(360<<16)|(6<<8)|(1))
+#define APLL_VAL_1400   ((1<<31)|(175<<16)|(3<<8)|(1))
+#define APLL_VAL_1300   ((1<<31)|(325<<16)|(6<<8)|(1))
+#define APLL_VAL_1200	((1<<31)|(150<<16)|(3<<8)|(1))
+#define APLL_VAL_1000	((1<<31)|(125<<16)|(3<<8)|(1))
+#define APLL_VAL_800	((1<<31)|(100<<16)|(3<<8)|(1))
 
 #define SLEEP_FREQ	(800 * 1000) /* Use 800MHz when entering sleep */
 
@@ -77,10 +81,13 @@ enum s5pv210_dmc_port {
 };
 
 static struct cpufreq_frequency_table s5pv210_freq_table[] = {
-	{OC0, 1520*1000},
-	{OC1, 1440*1000},
-	{OC2, 1200*1000},
-	{OC3, 1096*1000},
+	{OC0, 1700*1000},
+	{OC1, 1600*1000},
+	{OC2, 1500*1000},
+	{OC3, 1440*1000},
+	{OC4, 1400*1000},
+	{OC5, 1300*1000},
+	{OC6, 1200*1000},
 	{L0, 1000*1000},
 	{L1, 800*1000},
 	{L2, 400*1000},
@@ -99,30 +106,42 @@ struct s5pv210_dvs_conf {
 
 #ifdef CONFIG_DVFS_LIMIT
 static unsigned int g_dvfs_high_lock_token = 0;
-static unsigned int g_dvfs_high_lock_limit = 6;
+static unsigned int g_dvfs_high_lock_limit = 12;
 static unsigned int g_dvfslockval[DVFS_LOCK_TOKEN_NUM];
 //static DEFINE_MUTEX(dvfs_high_lock);
 #endif
 
-const unsigned long arm_volt_max = 1350000;
+const unsigned long arm_volt_max = 1500000;
 const unsigned long int_volt_max = 1250000;
 
 static struct s5pv210_dvs_conf dvs_conf[] = {
 	[OC0] = {
-		.arm_volt   = 1325000,
-		.int_volt   = 1135000,
+		.arm_volt   = 1400000,
+		.int_volt   = 1225000,
 	},
 	[OC1] = {
-		.arm_volt   = 1325000,
-		.int_volt   = 1135000,
+		.arm_volt   = 1400000,
+		.int_volt   = 1200000,
 	},
 	[OC2] = {
+		.arm_volt   = 1400000,
+		.int_volt   = 1200000,
+	},
+	[OC3] = {
+		.arm_volt   = 1400000,
+		.int_volt   = 1150000,
+	},
+	[OC4] = {
+		.arm_volt   = 1350000,
+		.int_volt   = 1125000,
+	},
+	[OC5] = {
 		.arm_volt   = 1300000,
 		.int_volt   = 1125000,
 	},
-	[OC3] = {
+	[OC6] = {
 		.arm_volt   = 1285000,
-		.int_volt   = 1120000,
+		.int_volt   = 1125000,
 	},
 	[L0] = {
 		.arm_volt   = 1275000,
@@ -146,24 +165,33 @@ static struct s5pv210_dvs_conf dvs_conf[] = {
 	},
 };
 
-static u32 clkdiv_val[9][11] = {
+static u32 clkdiv_val[12][11] = {
 	/*
 	 * Clock divider value for following
 	 * { APLL, A2M, HCLK_MSYS, PCLK_MSYS,
 	 *   HCLK_DSYS, PCLK_DSYS, HCLK_PSYS, PCLK_PSYS,
 	 *   ONEDRAM, MFC, G3D }
 	 */
-	/* OC0 : [1520/200/200/100][166/83][133/66][220/220] */
+	//OC0:1700
+	{0, 6.3, 6.3, 1.3, 3, 1, 4, 1, 3, 0.15, 0.15},
+
+	//OC1:1600
+	{0, 6, 6, 1, 3, 1, 4, 1, 3, 0, 0},
+
+	//OC2: 1500
 	{0, 5, 5, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* OC1 : [1440/200/200/100][166/83][133/66][220/220] */
+	//OC3: 1440
 	{0, 5, 5, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* OC2 : [1200/200/100][166/83][133/66][200/200] */
-	{0, 5, 4, 1, 3, 1, 4, 1, 3, 0, 0},
+	//OC4: 1400
+	{0, 5, 5, 1, 3, 1, 4, 1, 3, 0, 0},
 
-	/* OC3 : [1096/200/200/100][166/83][133/66][219,2/219,2] */
-	{0, 4, 4, 1, 3, 1, 4, 1, 3, 0, 0},
+	/* OC5 : [1300/200/200/100][166/83][133/66][200/200] */
+	{0, 5, 5, 1, 3, 1, 4, 1, 3, 0, 0},
+
+	/* OC6 : [1200/200/200/100][166/83][133/66][200/200] */
+	{0, 5, 5, 1, 3, 1, 4, 1, 3, 0, 0},
 
 	/* L0 : [1000/200/100][166/83][133/66][200/200] */
 	{0, 4, 4, 1, 3, 1, 4, 1, 3, 0, 0},
@@ -483,16 +511,25 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 		 */
 		switch (index) {
 		case OC0:
-			__raw_writel(APLL_VAL_1520, S5P_APLL_CON);
+			__raw_writel(APLL_VAL_1700, S5P_APLL_CON);
 			break;
 		case OC1:
-			__raw_writel(APLL_VAL_1440, S5P_APLL_CON);
+			__raw_writel(APLL_VAL_1600, S5P_APLL_CON);
 			break;
 		case OC2:
-			__raw_writel(APLL_VAL_1200, S5P_APLL_CON);
+			__raw_writel(APLL_VAL_1500, S5P_APLL_CON);
 			break;
 		case OC3:
-			__raw_writel(APLL_VAL_1096, S5P_APLL_CON);
+			__raw_writel(APLL_VAL_1440, S5P_APLL_CON);
+			break;
+		case OC4:
+			__raw_writel(APLL_VAL_1400, S5P_APLL_CON);
+			break;
+		case OC5:
+			__raw_writel(APLL_VAL_1300, S5P_APLL_CON);
+			break;
+		case OC6:
+			__raw_writel(APLL_VAL_1200, S5P_APLL_CON);
 			break;
 		case L0:
 			__raw_writel(APLL_VAL_1000, S5P_APLL_CON);
@@ -685,7 +722,7 @@ static int __init s5pv210_cpu_init(struct cpufreq_policy *policy)
 
 	/* Set max freq to 1GHz on startup */
 	ret = cpufreq_frequency_table_cpuinfo(policy, s5pv210_freq_table);
-	policy->min = 100000;
+	policy->min = 400000;
 	policy->max = 1000000;
 
 	return ret;
