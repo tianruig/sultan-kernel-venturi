@@ -91,8 +91,6 @@ static struct cpufreq_frequency_table s5pv210_freq_table[] = {
 	{L0, 1000*1000},
 	{L1, 800*1000},
 	{L2, 400*1000},
-	{L3, 200*1000},
-	{L4, 100*1000},
 	{0, CPUFREQ_TABLE_END},
 };
 
@@ -155,14 +153,6 @@ static struct s5pv210_dvs_conf dvs_conf[] = {
 		.arm_volt   = 1050000,
 		.int_volt   = 1100000,
 	},
-	[L3] = {
-		.arm_volt   = 950000,
-		.int_volt   = 1100000,
-	},
-	[L4] = {
-		.arm_volt   = 950000,
-		.int_volt   = 1000000,
-	},
 };
 
 static u32 clkdiv_val[12][11] = {
@@ -201,12 +191,6 @@ static u32 clkdiv_val[12][11] = {
 
 	/* L2 : [400/200/100][166/83][133/66][200/200] */
 	{1, 3, 1, 1, 3, 1, 4, 1, 3, 0, 0},
-
-	/* L3 : [200/200/100][166/83][133/66][200/200] */
-	{3, 3, 0, 1, 3, 1, 4, 1, 3, 0, 0},
-
-	/* L4 : [100/100/100][83/83][66/66][100/100] */
-	{7, 7, 0, 0, 7, 0, 9, 0, 7, 0, 0},
 };
 
 /*
@@ -394,7 +378,7 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 		pll_changing = 1;
 
 	/* Check if there need to change System bus clock */
-	if ((index == L4) || (freqs.old == s5pv210_freq_table[L4].frequency))
+	if ((index == L2) || (freqs.old == s5pv210_freq_table[L2].frequency))
 		bus_speed_changing = 1;
 
 	if (bus_speed_changing) {
@@ -448,7 +432,7 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 		} while (reg & ((1 << 7) | (1 << 3)));
 
 		/*
-		 * 3. DMC1 refresh count for 133Mhz if (index == L4) is
+		 * 3. DMC1 refresh count for 133Mhz if (index == L2) is
 		 * true refresh counter is already programed in upper
 		 * code. 0x287@83Mhz
 		 */
@@ -493,7 +477,7 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 	/* ARM MCS value changed */
 	reg = __raw_readl(S5P_ARM_MCS_CON);
 	reg &= ~0x3;
-	if (index >= L3)
+	if (index >= L2)
 		reg |= 0x3;
 	else
 		reg |= 0x1;
@@ -585,7 +569,7 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 
 		/*
 		 * 10. DMC1 refresh counter
-		 * L4 : DMC1 = 100Mhz 7.8us/(1/100) = 0x30c
+		 * L2 : DMC1 = 100Mhz 7.8us/(1/100) = 0x30c
 		 * Others : DMC1 = 200Mhz 7.8us/(1/200) = 0x618
 		 */
 		if (!bus_speed_changing)
@@ -593,7 +577,7 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 	}
 
 	/*
-	 * L4 level need to change memory bus speed, hence onedram clock divier
+	 * L2 level need to change memory bus speed, hence onedram clock divier
 	 * and memory refresh parameter should be changed
 	 */
 	if (bus_speed_changing) {
@@ -607,7 +591,7 @@ static int s5pv210_target(struct cpufreq_policy *policy,
 		} while (reg & (1 << 15));
 
 		/* Reconfigure DRAM refresh counter value */
-		if (index != L4) {
+		if (index != L2) {
 			/*
 			 * DMC0 : 166Mhz
 			 * DMC1 : 200Mhz
