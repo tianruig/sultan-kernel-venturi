@@ -37,7 +37,7 @@
 
 // Brightness Level 
 #define DIM_BL					20
-#define MIN_BL					30
+#define MIN_BL					20
 #define MAX_BL					255
 
 #define MAX_GAMMA_VALUE	24 // Venturi_?
@@ -50,7 +50,7 @@
 
 #if defined(CONFIG_MACH_VENTURI)
 #define MAX_BRIGHTNESS_LEVEL 255
-#define LOW_BRIGHTNESS_LEVEL 30
+#define LOW_BRIGHTNESS_LEVEL 20
 
 #define MAX_BACKLIGHT_VALUE_SONY 183 //180 // 190
 #define LOW_BACKLIGHT_VALUE_SONY 13 //8 //39 // 50
