@@ -35,9 +35,6 @@
 #include <asm/cputime.h>
 #include <linux/earlysuspend.h>
 
-extern unsigned long get_cpuL1freq(void);
-extern unsigned long get_cpuminfreq(void);
-
 /******************** Tunable parameters: ********************/
 
 /*
@@ -824,24 +821,17 @@ static struct early_suspend smartass_power_suspend = {
 static int __init cpufreq_smartass_init(void)
 {
 	unsigned int i;
-	unsigned long min_freq;
 	struct smartass_info_s *this_smartass;
 	
-	min_freq = get_cpuminfreq();
 	debug_mask = 0;
 	up_rate_us = DEFAULT_UP_RATE_US;
 	down_rate_us = DEFAULT_DOWN_RATE_US;
-	/* sleep_ideal_freq = DEFAULT_SLEEP_IDEAL_FREQ; */
-	sleep_ideal_freq = min_freq;
-	/* sleep_wakeup_freq = DEFAULT_SLEEP_WAKEUP_FREQ; */
-	sleep_wakeup_freq = get_cpuL1freq();
-	/* awake_ideal_freq = DEFAULT_AWAKE_IDEAL_FREQ; */
-	awake_ideal_freq = get_cpuL1freq();
+	sleep_ideal_freq = DEFAULT_SLEEP_IDEAL_FREQ;
+	sleep_wakeup_freq = DEFAULT_SLEEP_WAKEUP_FREQ;
+	awake_ideal_freq = DEFAULT_AWAKE_IDEAL_FREQ;
 	sample_rate_jiffies = DEFAULT_SAMPLE_RATE_JIFFIES;
-	/* ramp_up_step = DEFAULT_RAMP_UP_STEP; */
-	ramp_up_step = min_freq * 2;
-	/* ramp_down_step = DEFAULT_RAMP_DOWN_STEP; */
-	ramp_down_step = min_freq * 2;
+	ramp_up_step = DEFAULT_RAMP_UP_STEP;
+	ramp_down_step = DEFAULT_RAMP_DOWN_STEP;
 	max_cpu_load = DEFAULT_MAX_CPU_LOAD;
 	min_cpu_load = DEFAULT_MIN_CPU_LOAD;
 
