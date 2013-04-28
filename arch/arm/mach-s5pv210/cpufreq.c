@@ -115,7 +115,7 @@ const unsigned long int_volt_max = 1250000;
 static struct s5pv210_dvs_conf dvs_conf[] = {
 	[OC0] = {
 		.arm_volt   = 1475000,
-		.int_volt   = 1225000,
+		.int_volt   = 1200000,
 	},
 	[OC1] = {
 		.arm_volt   = 1450000,
@@ -163,7 +163,7 @@ static u32 clkdiv_val[12][11] = {
 	 *   ONEDRAM, MFC, G3D }
 	 */
 	//OC0:1700
-	{0, 6.3, 7, 1, 3, 1, 4, 1, 3, 0.15, 0.15},
+	{0, 6.2, 6.2, 1.2, 3, 1, 4, 1, 3, 0.15, 0.15},
 
 	//OC1:1600
 	{0, 5.75, 6, 1, 3, 1, 4, 1, 3, 0, 0},
