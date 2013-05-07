@@ -30,6 +30,9 @@
 #include <linux/input.h>
 #include <linux/irq.h>
 #include <linux/skbuff.h>
+#ifdef CONFIG_FORCE_FAST_CHARGE
+#include <linux/fastchg.h>
+#endif
 
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
@@ -3562,29 +3565,35 @@ static void fsa9480_jig_cb(bool attached)
 	return;
 }
 
-static void fsa9480_usb_cb(bool attached)
-{
-	struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);
-
-	if (gadget) {
-		if (attached)
-			usb_gadget_vbus_connect(gadget);
-		else
-			usb_gadget_vbus_disconnect(gadget);
-	}
-
-	mtp_off_status = false;
-
-	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
-	if (charger_callbacks && charger_callbacks->set_cable)
-		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
-}
-
 static void fsa9480_charger_cb(bool attached)
 {
-	set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
-	if (charger_callbacks && charger_callbacks->set_cable)
-		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
+        set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
+        if (callbacks && callbacks->set_cable)
+                callbacks->set_cable(callbacks, set_cable_status);
+}
+
+static void fsa9480_usb_cb(bool attached)
+{
+#ifdef CONFIG_FORCE_FAST_CHARGE
+	if (force_fast_charge != 0) {
+		fsa9480_charger_cb(attached);
+	} else {
+#endif
+		struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);
+
+		if (gadget) {
+			if (attached)
+				usb_gadget_vbus_connect(gadget);
+			else
+				usb_gadget_vbus_disconnect(gadget);
+		}
+
+		set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
+		if (callbacks && callbacks->set_cable)
+			callbacks->set_cable(callbacks, set_cable_status);
+#ifdef CONFIG_FORCE_FAST_CHARGE
+	}
+#endif
 }
 
 static struct switch_dev switch_dock = {
@@ -3593,25 +3602,31 @@ static struct switch_dev switch_dock = {
 
 static void fsa9480_deskdock_cb(bool attached)
 {
-	struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);
+#ifdef CONFIG_FORCE_FAST_CHARGE
+	if (force_fast_charge != 0) {
+	        fsa9480_charger_cb(attached);
+        } else {
+#endif
+		struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);
 
-	if (attached)
-		switch_set_state(&switch_dock, 1);
-	else
-		switch_set_state(&switch_dock, 0);
-
-	if (gadget) {
 		if (attached)
-			usb_gadget_vbus_connect(gadget);
+			switch_set_state(&switch_dock, 1);
 		else
-			usb_gadget_vbus_disconnect(gadget);
+			switch_set_state(&switch_dock, 0);
+
+		if (gadget) {
+			if (attached)
+				usb_gadget_vbus_connect(gadget);
+			else
+				usb_gadget_vbus_disconnect(gadget);
+		}
+
+		set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
+		if (callbacks && callbacks->set_cable)
+			callbacks->set_cable(callbacks, set_cable_status);
+#ifdef CONFIG_FORCE_FAST_CHARGE
 	}
-
-	mtp_off_status = false;
-
-	set_cable_status = attached ? CABLE_TYPE_MISC : CABLE_TYPE_NONE;
-	if (charger_callbacks && charger_callbacks->set_cable)
-		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
+#endif
 }
 
 static void fsa9480_cardock_cb(bool attached)
