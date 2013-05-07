@@ -3568,8 +3568,8 @@ static void fsa9480_jig_cb(bool attached)
 static void fsa9480_charger_cb(bool attached)
 {
         set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
-        if (callbacks && callbacks->set_cable)
-                callbacks->set_cable(callbacks, set_cable_status);
+        if (charger_callbacks && charger_callbacks->set_cable)
+                charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 }
 
 static void fsa9480_usb_cb(bool attached)
@@ -3589,8 +3589,8 @@ static void fsa9480_usb_cb(bool attached)
 		}
 
 		set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
-		if (callbacks && callbacks->set_cable)
-			callbacks->set_cable(callbacks, set_cable_status);
+		if (charger_callbacks && charger_callbacks->set_cable)
+			charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 #ifdef CONFIG_FORCE_FAST_CHARGE
 	}
 #endif
@@ -3622,8 +3622,8 @@ static void fsa9480_deskdock_cb(bool attached)
 		}
 
 		set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
-		if (callbacks && callbacks->set_cable)
-			callbacks->set_cable(callbacks, set_cable_status);
+		if (charger_callbacks && charger_callbacks->set_cable)
+			charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 #ifdef CONFIG_FORCE_FAST_CHARGE
 	}
 #endif
