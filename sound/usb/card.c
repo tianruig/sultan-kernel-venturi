@@ -562,6 +562,29 @@ static void usb_audio_disconnect(struct usb_interface *intf)
 }
 
 #ifdef CONFIG_PM
+
+int snd_usb_autoresume(struct snd_usb_audio *chip)
+{
+	int err = -ENODEV;
+
+	down_read(&chip->shutdown_rwsem);
+	if (chip->probing)
+		err = 0;
+	else if (!chip->shutdown)
+		err = usb_autopm_get_interface(chip->pm_intf);
+	up_read(&chip->shutdown_rwsem);
+
+	return err;
+}
+
+void snd_usb_autosuspend(struct snd_usb_audio *chip)
+{
+	down_read(&chip->shutdown_rwsem);
+	if (!chip->shutdown && !chip->probing)
+		usb_autopm_put_interface(chip->pm_intf);
+	up_read(&chip->shutdown_rwsem);
+}
+
 static int usb_audio_suspend(struct usb_interface *intf, pm_message_t message)
 {
 	struct snd_usb_audio *chip = usb_get_intfdata(intf);
