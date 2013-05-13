@@ -1,7 +1,3 @@
-#####################
-# .
-# Last modified: 1303434626.6776324710
-
 dir /dev 755 0 0
 dir /dev/block 755 0 0
 nod /dev/block/mmcblk0 644 0 0 b 179 0
@@ -24,26 +20,21 @@ dir /cache 755 0 0
 dir /emmc 755 0 0
 dir /proc 755 0 0
 dir /sys 755 0 0
-dir /lib 755 0 0 
-dir /lib/modules 755 0 0
-file /stage1/busybox source/usr/venturi_initramfs_files/busybox 755 0 0
+file /stage1/boot.cpio ../../ramdisk.cpio 644 0 0
+file /stage1/recovery.cpio ../../ramdisk-recovery.cpio 644 0 0
+file /stage1/busybox ../../utilities/busybox 755 0 0
 file /stage1/init source/usr/venturi_initramfs_files/init 755 0 0
-file /stage1/normalboot.tar.gz source/usr/venturi_initramfs_files/normalboot.tar.gz 755 0 0
-slink /stage1/sh busybox 755 0 0
-slink /stage1/insmod busybox 755 0 0
-slink /stage1/mount busybox 755 0 0
-slink /stage1/date busybox 755 0 0
-slink /stage1/rm busybox 755 0 0
-slink /stage1/dd busybox 755 0 0
-slink /stage1/touch busybox 755 0 0
-slink /stage1/test busybox 755 0 0
-slink /stage1/grep busybox 755 0 0
-slink /stage1/umount busybox 755 0 0
-slink /stage1/zcat busybox 755 0 0
-slink /stage1/cpio busybox 755 0 0
-slink /stage1/tail busybox 755 0 0
-slink /stage1/tar busybox 755 0 0
+file /stage1/param.bz2 source/usr/venturi_initramfs_files/param.bz2 755 0 0
+slink /stage1/bzcat busybox 755 0 0
 slink /stage1/cp busybox 755 0 0
+slink /stage1/cpio busybox 755 0 0
+slink /stage1/date busybox 755 0 0
+slink /stage1/dd busybox 755 0 0
 slink /stage1/echo busybox 755 0 0
+slink /stage1/grep busybox 755 0 0
+slink /stage1/mount busybox 755 0 0
+slink /stage1/rm busybox 755 0 0
+slink /stage1/sh busybox 755 0 0
+slink /stage1/test busybox 755 0 0
+slink /stage1/umount busybox 755 0 0
 slink /init /stage1/init 755 0 0
-

@@ -4,30 +4,25 @@ export PATH="/stage1"
 
 set -x
 
-date >>/boot.txt
-exec >>/boot.txt 2>&1
 cd /
-mount -t proc proc /proc
-mount -t sysfs sysfs /sys
-
 rm /init
 
-dd bs=512 if=/dev/block/mmcblk0p11 of=/stage1/boot.bin
+date >>/boot.txt
+exec >>/boot.txt 2>&1
 
-eval $(grep -m 1 -A 1 BOOT_IMAGE_OFFSETS /stage1/boot.bin | tail -n 1)
-
-load_offset=$boot_offset
-load_len=$boot_len
-
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
 mount -t ext4 /dev/block/mmcblk0p15 /cache
 
+image=/stage1/boot.cpio
+
 if test -e /cache/.startrecovery || grep -q bootmode=2 /proc/cmdline ; then
-	# recovery boot and dd if a normally-booting param.blk to mmcblk0p9
-	tar -zxvf /stage1/normalboot.tar.gz
-	dd if=/bootnormally.img of=/dev/block/mmcblk0p9
-	rm -fr /cache/.startrecovery
-	load_offset=$recovery_offset
-	load_len=$recovery_len
+	# recovery boot so dd param.lfs to work around missing proprietary driver
+	bzcat /stage1/param.bz2 | dd of=/dev/block/mmcblk0p9
+
+	rm -rf /cache/.startrecovery
+	image=/stage1/recovery.cpio
+
 	# disable lpm
 	echo 0 > /sys/class/power_supply/battery/charging_mode_booting
 fi
@@ -35,24 +30,23 @@ fi
 umount /cache
 rm -rf /cache
 
-dd bs=512 if=/stage1/boot.bin skip=$load_offset count=$load_len | zcat | cpio -i
+cpio -i < ${image}
 
 if grep -q 1 /sys/class/power_supply/battery/charging_mode_booting ; then
 	# low power mode
-	cp lpm.rc init.rc
+	cp -f lpm.rc init.rc
 fi
 
 umount /sys
 umount /proc
+
 date >> /boot.txt
 
-mount -t vfat /dev/block/mmcblk0p17 /emmc/
+mount -t vfat /dev/block/mmcblk0p17 /emmc
 cp /boot.txt /emmc/boot.txt
 umount /emmc
-rm -rf /emmc
 
-rm -rf /dev/*
-rm -rf /stage1 
+rm -rf /dev/* /stage1 /emmc
 
 export PATH="${_PATH}"
 
