@@ -94,3 +94,5 @@ _tool
 kernel/usr/initramfs/
 
 Module.symvers
+
+!param.bz2
