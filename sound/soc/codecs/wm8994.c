@@ -1107,12 +1107,282 @@ static int wm8994_hw_params(struct snd_pcm_substream *substream,
 	clocking3 = wm8994_read(codec, WM8994_AIF1_RATE);
 	clocking3 &= ~(WM8994_AIF1_SR_MASK | WM8994_AIF1CLK_RATE_MASK);
 
-	aif1 = wm8994_read(codec, WM8994_AIF1_CONTROL_1);
-	aif1 &= ~WM8994_AIF1_WL_MASK;
-	aif4 = wm8994_read(codec,WM8994_AIF1ADC_LRCLK);
-	aif4 &= ~WM8994_AIF1ADC_LRCLK_DIR ;
-	aif5 = wm8994_read(codec,WM8994_AIF1DAC_LRCLK);
-	aif5 &= ~WM8994_AIF1DAC_LRCLK_DIR_MASK;
+	/* Try to find an appropriate sample rate; look for an exact match. */
+	for (i = 0; i < ARRAY_SIZE(srs); i++)
+		if (srs[i].rate == params_rate(params))
+			break;
+	if (i == ARRAY_SIZE(srs))
+		return -EINVAL;
+	rate_val |= srs[i].val << WM8994_AIF1_SR_SHIFT;
+
+	dev_dbg(dai->dev, "Sample rate is %dHz\n", srs[i].rate);
+	dev_dbg(dai->dev, "AIF%dCLK is %dHz, target BCLK %dHz\n",
+		dai->id, wm8994->aifclk[id], bclk_rate);
+
+	if (params_channels(params) == 1 &&
+	    (snd_soc_read(codec, aif1_reg) & 0x18) == 0x18)
+		aif2 |= WM8994_AIF1_MONO;
+
+	if (wm8994->aifclk[id] == 0) {
+		dev_err(dai->dev, "AIF%dCLK not configured\n", dai->id);
+		return -EINVAL;
+	}
+
+	/* AIFCLK/fs ratio; look for a close match in either direction */
+	best = 0;
+	best_val = abs((fs_ratios[0] * params_rate(params))
+		       - wm8994->aifclk[id]);
+	for (i = 1; i < ARRAY_SIZE(fs_ratios); i++) {
+		cur_val = abs((fs_ratios[i] * params_rate(params))
+			      - wm8994->aifclk[id]);
+		if (cur_val >= best_val)
+			continue;
+		best = i;
+		best_val = cur_val;
+	}
+	dev_dbg(dai->dev, "Selected AIF%dCLK/fs = %d\n",
+		dai->id, fs_ratios[best]);
+	rate_val |= best;
+
+	/* We may not get quite the right frequency if using
+	 * approximate clocks so look for the closest match that is
+	 * higher than the target (we need to ensure that there enough
+	 * BCLKs to clock out the samples).
+	 */
+	best = 0;
+	for (i = 0; i < ARRAY_SIZE(bclk_divs); i++) {
+		cur_val = (wm8994->aifclk[id] * 10 / bclk_divs[i]) - bclk_rate;
+		if (cur_val < 0) /* BCLK table is sorted */
+			break;
+		best = i;
+	}
+	bclk_rate = wm8994->aifclk[id] * 10 / bclk_divs[best];
+	dev_dbg(dai->dev, "Using BCLK_DIV %d for actual BCLK %dHz\n",
+		bclk_divs[best], bclk_rate);
+	bclk |= best << WM8994_AIF1_BCLK_DIV_SHIFT;
+
+	lrclk = bclk_rate / params_rate(params);
+	dev_dbg(dai->dev, "Using LRCLK rate %d for actual LRCLK %dHz\n",
+		lrclk, bclk_rate / lrclk);
+
+	snd_soc_update_bits(codec, aif1_reg, WM8994_AIF1_WL_MASK, aif1);
+	snd_soc_update_bits(codec, aif2_reg, WM8994_AIF1_MONO, aif2);
+	snd_soc_update_bits(codec, bclk_reg, WM8994_AIF1_BCLK_DIV_MASK, bclk);
+	snd_soc_update_bits(codec, lrclk_reg, WM8994_AIF1DAC_RATE_MASK,
+			    lrclk);
+	snd_soc_update_bits(codec, rate_reg, WM8994_AIF1_SR_MASK |
+			    WM8994_AIF1CLK_RATE_MASK, rate_val);
+
+	if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK) {
+		switch (dai->id) {
+		case 1:
+			wm8994->dac_rates[0] = params_rate(params);
+			wm8994_set_retune_mobile(codec, 0);
+			wm8994_set_retune_mobile(codec, 1);
+			break;
+		case 2:
+			wm8994->dac_rates[1] = params_rate(params);
+			wm8994_set_retune_mobile(codec, 2);
+			break;
+		}
+	}
+
+	return 0;
+}
+
+static int wm8994_aif3_hw_params(struct snd_pcm_substream *substream,
+				 struct snd_pcm_hw_params *params,
+				 struct snd_soc_dai *dai)
+{
+	struct snd_soc_codec *codec = dai->codec;
+	struct wm8994 *control = codec->control_data;
+	int aif1_reg;
+	int aif1 = 0;
+
+	switch (dai->id) {
+	case 3:
+		switch (control->type) {
+		case WM8958:
+			aif1_reg = WM8958_AIF3_CONTROL_1;
+			break;
+		default:
+			return 0;
+		}
+		break;
+	default:
+		return 0;
+	}
+
+	switch (params_format(params)) {
+	case SNDRV_PCM_FORMAT_S16_LE:
+		break;
+	case SNDRV_PCM_FORMAT_S20_3LE:
+		aif1 |= 0x20;
+		break;
+	case SNDRV_PCM_FORMAT_S24_LE:
+		aif1 |= 0x40;
+		break;
+	case SNDRV_PCM_FORMAT_S32_LE:
+		aif1 |= 0x60;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	return snd_soc_update_bits(codec, aif1_reg, WM8994_AIF1_WL_MASK, aif1);
+}
+
+static int wm8994_aif_mute(struct snd_soc_dai *codec_dai, int mute)
+{
+	struct snd_soc_codec *codec = codec_dai->codec;
+	int mute_reg;
+	int reg;
+
+	switch (codec_dai->id) {
+	case 1:
+		mute_reg = WM8994_AIF1_DAC1_FILTERS_1;
+		break;
+	case 2:
+		mute_reg = WM8994_AIF2_DAC_FILTERS_1;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	if (mute)
+		reg = WM8994_AIF1DAC1_MUTE;
+	else
+		reg = 0;
+
+	snd_soc_update_bits(codec, mute_reg, WM8994_AIF1DAC1_MUTE, reg);
+
+	return 0;
+}
+
+static int wm8994_set_tristate(struct snd_soc_dai *codec_dai, int tristate)
+{
+	struct snd_soc_codec *codec = codec_dai->codec;
+	int reg, val, mask;
+
+	switch (codec_dai->id) {
+	case 1:
+		reg = WM8994_AIF1_MASTER_SLAVE;
+		mask = WM8994_AIF1_TRI;
+		break;
+	case 2:
+		reg = WM8994_AIF2_MASTER_SLAVE;
+		mask = WM8994_AIF2_TRI;
+		break;
+	case 3:
+		reg = WM8994_POWER_MANAGEMENT_6;
+		mask = WM8994_AIF3_TRI;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	if (tristate)
+		val = mask;
+	else
+		val = 0;
+
+	return snd_soc_update_bits(codec, reg, mask, val);
+}
+
+#define WM8994_RATES SNDRV_PCM_RATE_8000_96000
+
+#define WM8994_FORMATS (SNDRV_PCM_FMTBIT_S16_LE | SNDRV_PCM_FMTBIT_S20_3LE |\
+			SNDRV_PCM_FMTBIT_S24_LE | SNDRV_PCM_FMTBIT_S32_LE)
+
+static struct snd_soc_dai_ops wm8994_aif1_dai_ops = {
+	.set_sysclk	= wm8994_set_dai_sysclk,
+	.set_fmt	= wm8994_set_dai_fmt,
+	.hw_params	= wm8994_hw_params,
+	.digital_mute	= wm8994_aif_mute,
+	.set_pll	= wm8994_set_fll,
+	.set_tristate	= wm8994_set_tristate,
+};
+
+static struct snd_soc_dai_ops wm8994_aif2_dai_ops = {
+	.set_sysclk	= wm8994_set_dai_sysclk,
+	.set_fmt	= wm8994_set_dai_fmt,
+	.hw_params	= wm8994_hw_params,
+	.digital_mute   = wm8994_aif_mute,
+	.set_pll	= wm8994_set_fll,
+	.set_tristate	= wm8994_set_tristate,
+};
+
+static struct snd_soc_dai_ops wm8994_aif3_dai_ops = {
+	.hw_params	= wm8994_aif3_hw_params,
+	.set_tristate	= wm8994_set_tristate,
+};
+
+static struct snd_soc_dai_driver wm8994_dai[] = {
+	{
+		.name = "wm8994-aif1",
+		.id = 1,
+		.playback = {
+			.stream_name = "AIF1 Playback",
+			.channels_min = 1,
+			.channels_max = 2,
+			.rates = WM8994_RATES,
+			.formats = WM8994_FORMATS,
+		},
+		.capture = {
+			.stream_name = "AIF1 Capture",
+			.channels_min = 1,
+			.channels_max = 2,
+			.rates = WM8994_RATES,
+			.formats = WM8994_FORMATS,
+		 },
+		.ops = &wm8994_aif1_dai_ops,
+	},
+	{
+		.name = "wm8994-aif2",
+		.id = 2,
+		.playback = {
+			.stream_name = "AIF2 Playback",
+			.channels_min = 1,
+			.channels_max = 2,
+			.rates = WM8994_RATES,
+			.formats = WM8994_FORMATS,
+		},
+		.capture = {
+			.stream_name = "AIF2 Capture",
+			.channels_min = 1,
+			.channels_max = 2,
+			.rates = WM8994_RATES,
+			.formats = WM8994_FORMATS,
+		},
+		.ops = &wm8994_aif2_dai_ops,
+	},
+	{
+		.name = "wm8994-aif3",
+		.id = 3,
+		.playback = {
+			.stream_name = "AIF3 Playback",
+			.channels_min = 1,
+			.channels_max = 2,
+			.rates = WM8994_RATES,
+			.formats = WM8994_FORMATS,
+		},
+		.capture = {
+			.stream_name = "AIF3 Capture",
+			.channels_min = 1,
+			.channels_max = 2,
+			.rates = WM8994_RATES,
+			.formats = WM8994_FORMATS,
+		},
+		.ops = &wm8994_aif3_dai_ops,
+	}
+};
+
+#ifdef CONFIG_PM
+static int wm8994_suspend(struct snd_soc_codec *codec, pm_message_t state)
+{
+	struct wm8994_priv *wm8994 = snd_soc_codec_get_drvdata(codec);
+	struct wm8994 *control = codec->control_data;
+	int i, ret;
 
 	/* What BCLK do we need? */
 	wm8994->fs = params_rate(params);
