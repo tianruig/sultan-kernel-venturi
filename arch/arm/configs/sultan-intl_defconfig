@@ -1,6 +1,6 @@
 #
 # Automatically generated make config: don't edit
-# Linux/arm 3.0.78 Kernel Configuration
+# Linux/arm 3.0.84 Kernel Configuration
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -2073,7 +2073,7 @@ CONFIG_DWC_OTG_FIFO_LE=y
 # USB Device Class drivers
 #
 CONFIG_USB_ACM=y
-# CONFIG_USB_PRINTER is not set
+CONFIG_USB_PRINTER=y
 # CONFIG_USB_WDM is not set
 # CONFIG_USB_TMC is not set
 
@@ -2738,6 +2738,11 @@ CONFIG_CRC16=y
 # CONFIG_CRC_T10DIF is not set
 # CONFIG_CRC_ITU_T is not set
 CONFIG_CRC32=y
+# CONFIG_CRC32_SELFTEST is not set
+CONFIG_CRC32_SLICEBY8=y
+# CONFIG_CRC32_SLICEBY4 is not set
+# CONFIG_CRC32_SARWATE is not set
+# CONFIG_CRC32_BIT is not set
 # CONFIG_CRC7 is not set
 CONFIG_LIBCRC32C=y
 CONFIG_ZLIB_INFLATE=y
