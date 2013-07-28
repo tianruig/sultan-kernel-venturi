@@ -2480,10 +2480,12 @@ static void Delay1us(void)
 }
 #endif
 
+#if 0
 static void Delay10us(UInt32 uSdelay)
 {
 	mdelay(uSdelay);
 }
+#endif
 
 void OSTASK_Sleep(int delay)
 {
@@ -2740,7 +2742,7 @@ void SCLKHigh(void)
 #endif
 	I2C_CLR_SCL_GPIO();		//gpio output
 	I2C_SET_SCL_GPIO_HIGH();//gpio output high
-	Delay10us(1);
+	//Delay10us(1);
 }
 
 
@@ -2761,7 +2763,7 @@ void SCLKLow(void)
 #endif
 	I2C_CLR_SCL_GPIO(); 	//gpio output
 	I2C_SET_SCL_GPIO_LOW();	//gpio output low
-	Delay10us(1);
+	//Delay10us(1);
 }
 
 #ifndef RESET_MODE  // Only needed for power cycle mode
@@ -2824,7 +2826,7 @@ void SetSDATAHigh(void)
 #endif
 	I2C_CLR_SDA_GPIO(); 	//gpio output
 	I2C_SET_SDA_GPIO_HIGH();//gpio output high
-	Delay10us(2);
+	//Delay10us(2);
 }
 
 // ********************* LOW-LEVEL ISSP SUBROUTINE SECTION ********************
@@ -2844,7 +2846,7 @@ void SetSDATALow(void)
 #endif
 	I2C_CLR_SDA_GPIO(); 	//gpio output
 	I2C_SET_SDA_GPIO_LOW();	//gpio output low
-	Delay10us(2);
+	//Delay10us(2);
 }
 
 // ********************* LOW-LEVEL ISSP SUBROUTINE SECTION ********************
@@ -4419,17 +4421,17 @@ int tma340_frimware_update(void)
 
 MCSDL_DOWNLOAD_FINISH :
 
-	Delay10us(50*1000);
-	Delay10us(50*1000);
+	//Delay10us(50*1000);
+	//Delay10us(50*1000);
 
 	/* Enable watchdog and interrupt */
 	TchDrv_DownloadEnableWD();
 //	TchDrv_DownloadEnableIRQ();
 
-	Delay10us(50*1000);
-	Delay10us(50*1000);
-	Delay10us(50*1000);
-	Delay10us(50*1000);
+	//Delay10us(50*1000);
+	//Delay10us(50*1000);
+	//Delay10us(50*1000);
+	//Delay10us(50*1000);
 
 	return fIsError;
 
