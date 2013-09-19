@@ -114,6 +114,9 @@ struct page {
 	 */
 	void *shadow;
 #endif
+#ifdef CONFIG_UKSM
+	struct vma_slot *uksm_vma_slot;
+#endif
 };
 
 typedef unsigned long __nocast vm_flags_t;
