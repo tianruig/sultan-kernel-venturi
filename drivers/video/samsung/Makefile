@@ -2,8 +2,6 @@
 # Makefile for the s3c framebuffer driver
 #
 
-ccflags-y := -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mvectorize-with-neon-double
-
 ifeq ($(CONFIG_FB_S3C),y)
 obj-y				+= s3cfb.o
 obj-$(CONFIG_ARCH_S5PV210)	+= s3cfb_fimd6x.o
