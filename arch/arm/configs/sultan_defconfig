@@ -1077,8 +1077,7 @@ CONFIG_BCMDHD=m
 CONFIG_BCMDHD_FW_PATH="/vendor/firmware/fw_bcmdhd.bin"
 CONFIG_BCMDHD_NVRAM_PATH="/vendor/firmware/nvram_net.txt"
 # CONFIG_DHD_USE_STATIC_BUF is not set
-# CONFIG_DHD_USE_SCHED_SCAN is not set
-# CONFIG_DHD_ENABLE_P2P is not set
+CONFIG_BCMDHD_WIFI_PM=y
 # CONFIG_HOSTAP is not set
 # CONFIG_IWM is not set
 # CONFIG_LIBERTAS is not set
@@ -2468,10 +2467,6 @@ CONFIG_NETWORK_FILESYSTEMS=y
 # CONFIG_NFSD is not set
 # CONFIG_CEPH_FS is not set
 # CONFIG_CIFS is not set
-# CONFIG_CIFS_STATS is not set
-# CONFIG_CIFS_WEAK_PW_HASH is not set
-# CONFIG_CIFS_XATTR is not set
-# CONFIG_CIFS_DEBUG2 is not set
 # CONFIG_NCP_FS is not set
 # CONFIG_CODA_FS is not set
 # CONFIG_AFS_FS is not set
