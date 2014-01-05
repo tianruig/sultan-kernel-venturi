@@ -816,7 +816,7 @@ static int s5k5ccgx_get_flash_value(struct v4l2_subdev *sd, s5k5ccgx_short_t reg
 	if(CamTunningStatus == 0)
 	{
 		flash_value = s5k5ccgx_regs_table_write(client, name);
-		s5k5ccgx_msg(&client->dev, "%s: return_value(%d)\n", __func__,flash_value);
+		s5k5ccgx_info(&client->dev, "%s: return_value(%d)\n", __func__,flash_value);
 		return flash_value;
 	}
 	else
@@ -829,7 +829,7 @@ static int s5k5ccgx_get_flash_value(struct v4l2_subdev *sd, s5k5ccgx_short_t reg
 			}
 			else if(regs[i].addr == 0xdddd)
 			{
-				s5k5ccgx_msg(&client->dev, "%s: return_value(%d)\n", __func__, regs[i].val);
+				s5k5ccgx_info(&client->dev, "%s: return_value(%d)\n", __func__, regs[i].val);
 				return regs[i].val;
 			}
 		}
@@ -981,7 +981,7 @@ static int s5k5ccgx_set_frame_rate(struct v4l2_subdev *sd, struct v4l2_control *
 
 	int err = 0;
 
-	s5k5ccgx_msg(&client->dev, "%s Entered! value = %d\n", __func__, ctrl->value);
+	s5k5ccgx_info(&client->dev, "%s Entered! value = %d\n", __func__, ctrl->value);
 	
 	switch(ctrl->value)
 	{
@@ -1030,10 +1030,10 @@ static unsigned long s5k5ccgx_get_illumination(struct v4l2_subdev *sd)
 	err=s5k5ccgx_i2c_write(client,0x002E, 0x2A3C);
 	err=s5k5ccgx_i2c_read_multi(client, 0x0F12, &read_value);
 
-//	s5k5ccgx_msg(&client->dev, "%s: lux_value == 0x%x \n", __func__, read_value);	
+//	s5k5ccgx_info(&client->dev, "%s: lux_value == 0x%x \n", __func__, read_value);	
 
 	if(err < 0){
-		s5k5ccgx_msg(&client->dev, "%s: failed: s5k5ccgx_get_auto_focus_status\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: failed: s5k5ccgx_get_auto_focus_status\n", __func__);
 	      	 return -EIO;
 	}
 	
@@ -1048,7 +1048,7 @@ static int s5k5ccgx_set_preview_size(struct v4l2_subdev *sd)
 	struct s5k5ccgx_state *state = to_state(sd);
 	int index = state->framesize_index;
 
-	s5k5ccgx_msg(&client->dev, "%s: index = %d\n", __func__, index);
+	s5k5ccgx_info(&client->dev, "%s: index = %d\n", __func__, index);
 
 	switch(index){
 		
@@ -1078,7 +1078,7 @@ static int s5k5ccgx_set_preview_size(struct v4l2_subdev *sd)
 		/* When running in image capture mode, the call comes here.
  		 * Set the default video resolution - S5K5CCGX_PREVIEW_VGA
  		 */ 
-		s5k5ccgx_msg(&client->dev, "Setting preview resoution as VGA for image capture mode\n");
+		s5k5ccgx_info(&client->dev, "Setting preview resoution as VGA for image capture mode\n");
 		break;
 	}
 
@@ -1126,7 +1126,7 @@ static int s5k5ccgx_set_preview_start(struct v4l2_subdev *sd)
 		// 3. FPS setting
 		if(state->cameramode ==1) //in case camera mode, fixed auto_30
 		{
-			s5k5ccgx_msg(&client->dev, "%s: S5K5CCGX_30_FPS \n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: S5K5CCGX_30_FPS \n", __func__);
 			err = s5k5ccgx_i2c_write_block(sd,S5K5CCGX_30_FPS,S5K5CCGX_30_FPS_INDEX,"S5K5CCGX_30_FPS");
 		}
 
@@ -1152,7 +1152,7 @@ static int s5k5ccgx_set_preview_stop(struct v4l2_subdev *sd)
 		state->runmode = S5K5CCGX_RUNMODE_IDLE;
 	}
 
-	s5k5ccgx_msg(&client->dev, "%s: change preview mode~~~~~~~~~~~~~~\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: change preview mode~~~~~~~~~~~~~~\n", __func__);
 	
 	return 0;
 }
@@ -1212,7 +1212,7 @@ static int s5k5ccgx_set_capture_start(struct v4l2_subdev *sd, struct v4l2_contro
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 	struct s5k5ccgx_state *state = to_state(sd);
 
-	s5k5ccgx_msg(&client->dev, "%s: S5K5CCGX_CAPTURE(Single)\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: S5K5CCGX_CAPTURE(Single)\n", __func__);
 
 	// Capture size
 	err =s5k5ccgx_set_capture_size(sd);
@@ -1281,7 +1281,7 @@ static int s5k5ccgx_set_capture_start(struct v4l2_subdev *sd, struct v4l2_contro
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 	struct s5k5ccgx_state *state = to_state(sd);
 
-	s5k5ccgx_msg(&client->dev, "%s: S5K5CCGX_CAPTURE(not single)\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: S5K5CCGX_CAPTURE(not single)\n", __func__);
 
 	// Capture size
 	err =s5k5ccgx_set_capture_size(sd);
@@ -1300,7 +1300,7 @@ static int s5k5ccgx_set_capture_start(struct v4l2_subdev *sd, struct v4l2_contro
 	}
 	else if (state->flashstate == TRUE) // FLASH CAPTURE
 	{
-		s5k5ccgx_msg(&client->dev, "%s: Flashstate is true. freflash_lux_value = %d\n", __func__, freflash_lux_value);
+		s5k5ccgx_info(&client->dev, "%s: Flashstate is true. freflash_lux_value = %d\n", __func__, freflash_lux_value);
 		if (freflash_lux_value > 0x0020) 	// Normalt snapshot
 			err = s5k5ccgx_i2c_write_block(sd, S5K5CCGX_FLASH_NORMAL_SNAPSHOT,S5K5CCGX_FLASH_NORMAL_SNAPSHOT_INDEX,"S5K5CCGX_FLASH_NORMAL_SNAPSHOT");		
 		else 						//lowlight snapshot
@@ -1362,7 +1362,7 @@ static int s5k5ccgx_set_jpeg_quality(struct v4l2_subdev *sd)
 			break;
 	}
 
-	s5k5ccgx_msg(&client->dev, "Quality = %d \n", state->jpeg.quality);
+	s5k5ccgx_info(&client->dev, "Quality = %d \n", state->jpeg.quality);
 
 	if(err < 0)
 	{
@@ -1370,7 +1370,7 @@ static int s5k5ccgx_set_jpeg_quality(struct v4l2_subdev *sd)
 		return -EIO;
 	}
 
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 }
@@ -1379,7 +1379,7 @@ static int s5k5ccgx_set_dzoom(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 {
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 }
@@ -1393,13 +1393,13 @@ static int s5k5ccgx_set_ae_awb(struct v4l2_subdev *sd, int lock)
 	switch(lock)
 	{
 		case AE_LOCK_AWB_UNLOCK: //not support
-			s5k5ccgx_msg(&client->dev, "%s: Not support AE_LOCK_AWB_UNLOCK\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: Not support AE_LOCK_AWB_UNLOCK\n", __func__);
 			err = s5k5ccgx_i2c_write_block(sd,S5K5CCGX_AE_LOCK,S5K5CCGX_AE_LOCK_INDEX,"S5K5CCGX_AE_LOCK");
 			//err = s5k5ccgx_i2c_write_block(sd,S5K5CCGX_AWE_UNLOCK,S5K5CCGX_AWE_UNLOCK_INDEX,"S5K5CCGX_AWE_UNLOCK");
 			break;
 
 		case AE_UNLOCK_AWB_LOCK: //not support
-			s5k5ccgx_msg(&client->dev, "%s: Not support AE_UNLOCK_AWB_LOCK\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: Not support AE_UNLOCK_AWB_LOCK\n", __func__);
 			//err = s5k5ccgx_i2c_write_block(sd,S5K5CCGX_AE_UNLOCK,S5K5CCGX_AE_UNLOCK_INDEX,"S5K5CCGX_AE_UNLOCK");
 			err = s5k5ccgx_i2c_write_block(sd,S5K5CCGX_AWE_LOCK,S5K5CCGX_AWE_LOCK_INDEX,"S5K5CCGX_AWE_LOCK");
 			break;
@@ -1425,7 +1425,7 @@ static int s5k5ccgx_set_ae_awb(struct v4l2_subdev *sd, int lock)
 		return -EIO;
 	}
 
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 }
@@ -1452,7 +1452,7 @@ static int s5k5ccgx_set_ae_lock(struct v4l2_subdev *sd, int lock)
 		return -EIO;
 	}
 
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 }
@@ -1463,7 +1463,7 @@ static int s5k5ccgx_change_scene_mode(struct v4l2_subdev *sd, struct v4l2_contro
 	int err;
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 
-	s5k5ccgx_msg(&client->dev, "%s: scene_mode = %d \n", __func__, ctrl->value);
+	s5k5ccgx_info(&client->dev, "%s: scene_mode = %d \n", __func__, ctrl->value);
 
 	err = s5k5ccgx_i2c_write_block(sd,S5K5CCGX_SCENE_OFF,S5K5CCGX_SCENE_OFF_INDEX,"S5K5CCGX_SCENE_OFF"); //LSI
 
@@ -1535,7 +1535,7 @@ static int s5k5ccgx_change_scene_mode(struct v4l2_subdev *sd, struct v4l2_contro
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 	
@@ -1550,12 +1550,14 @@ static int s5k5ccgx_set_flash(int flash_func, struct v4l2_subdev *sd)
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 	struct s5k5ccgx_platform_data *pdata = client->dev.platform_data;
 
-	s5k5ccgx_msg(&client->dev, "%s: Set flash. Flash mode = %d, Flash on = %d\n", __func__, flash_mode, flash_func);
+	s5k5ccgx_info(&client->dev, "%s: Set flash. Flash mode = %d, Flash on = %d\n", __func__, flash_mode, flash_func);
 
 	err = pdata->flash_onoff(flash_func);
 	return err;
 }
-
+/* Meticulus: Function changed to only handle Torch.
+ * flash_mode is set in s5k5ccgx_s_ctrl.
+ */ 
 static int s5k5ccgx_set_flash_mode(struct v4l2_subdev *sd, int flash_brightness_value, bool value)
 {
 	int err;
@@ -1568,26 +1570,14 @@ static int s5k5ccgx_set_flash_mode(struct v4l2_subdev *sd, int flash_brightness_
 	if(value){
 		switch(flash_mode)
 			{
-				case FLASHMODE_AUTO:
-					lux_value = s5k5ccgx_get_illumination(sd);
-
-					if (lux_value < 0x0020) 
-					{
-						err = s5k5ccgx_set_flash(FLASH_ON, sd);
-						state->flashstate = TRUE;
-					}
-					else
-						state->flashstate = FALSE;
-
-					break;
-					
-				case FLASHMODE_ON:
+				//4 = Torch		
+				case 4:
 						err =s5k5ccgx_set_flash(FLASH_ON, sd);
 						state->flashstate = TRUE;
 					break;
 					
 				case FLASHMODE_OFF:
-						//err =s5k5ccgx_set_flash(0, sd);
+						err =s5k5ccgx_set_flash(FLASH_OFF, sd);
 						state->flashstate = FALSE;
 					break;
 					
@@ -1784,7 +1774,7 @@ static int s5k5ccgx_set_effect(struct v4l2_subdev *sd, struct v4l2_control *ctrl
 		break;
 
 		case IMAGE_EFFECT_ANTIQUE: //Not support
-			s5k5ccgx_msg(&client->dev, "%s: Not support IMAGE_EFFECT_ANTIQUE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: Not support IMAGE_EFFECT_ANTIQUE\n", __func__);
 		break;
 
 		case IMAGE_EFFECT_NEGATIVE:
@@ -1792,7 +1782,7 @@ static int s5k5ccgx_set_effect(struct v4l2_subdev *sd, struct v4l2_control *ctrl
 		break;
 
 		case IMAGE_EFFECT_SHARPEN: //Not support
-			s5k5ccgx_msg(&client->dev, "%s: Not support IMAGE_EFFECT_SHARPEN\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: Not support IMAGE_EFFECT_SHARPEN\n", __func__);
 		break;
 		
 		default:
@@ -1805,7 +1795,7 @@ static int s5k5ccgx_set_effect(struct v4l2_subdev *sd, struct v4l2_control *ctrl
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 }
@@ -1847,7 +1837,7 @@ static int s5k5ccgx_set_saturation(struct v4l2_subdev *sd, struct v4l2_control *
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done, saturation: %d\n", __func__, ctrl->value);
+	s5k5ccgx_info(&client->dev, "%s: done, saturation: %d\n", __func__, ctrl->value);
 
 	return 0;
 }
@@ -1889,7 +1879,7 @@ static int s5k5ccgx_set_contrast(struct v4l2_subdev *sd, struct v4l2_control *ct
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done, contrast: %d\n", __func__, ctrl->value);
+	s5k5ccgx_info(&client->dev, "%s: done, contrast: %d\n", __func__, ctrl->value);
 
 	return 0;
 }
@@ -1931,7 +1921,7 @@ static int s5k5ccgx_set_sharpness(struct v4l2_subdev *sd, struct v4l2_control *c
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done, sharpness: %d\n", __func__, ctrl->value);
+	s5k5ccgx_info(&client->dev, "%s: done, sharpness: %d\n", __func__, ctrl->value);
 
 	return 0;
 }
@@ -1943,7 +1933,7 @@ static int s5k5ccgx_set_sensor_mode(struct v4l2_subdev *sd, struct v4l2_control 
 
 	int err = 0;
 	
-	s5k5ccgx_msg(&client->dev,"func(%s):line(%d):ctrl->value(%d)\n",__func__,__LINE__,ctrl->value);
+	s5k5ccgx_info(&client->dev,"func(%s):line(%d):ctrl->value(%d)\n",__func__,__LINE__,ctrl->value);
 	
 	if (ctrl->value == 1) 
 	{
@@ -2007,7 +1997,7 @@ static int s5k5ccgx_set_white_balance(struct v4l2_subdev *sd, struct v4l2_contro
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 }
@@ -2066,7 +2056,7 @@ static int s5k5ccgx_set_ev(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done %d\n", __func__,ctrl->value);
+	s5k5ccgx_info(&client->dev, "%s: done %d\n", __func__,ctrl->value);
 
 	return 0;
 }
@@ -2101,7 +2091,7 @@ static int s5k5ccgx_set_metering(struct v4l2_subdev *sd, struct v4l2_control *ct
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 }
@@ -2135,29 +2125,29 @@ static int s5k5ccgx_set_iso(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 		break;
 
 		case ISO_800: //Not support
-			s5k5ccgx_msg(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);
+			s5k5ccgx_info(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);
 		break;
 
 		case ISO_1600: //Not support
-			s5k5ccgx_msg(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);
+			s5k5ccgx_info(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);
 		break;
 
 		/* This is additional setting for Sports' scene mode */
 		case ISO_SPORTS: //Not support
-			s5k5ccgx_msg(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);	
+			s5k5ccgx_info(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);	
 		break;
 		
 		/* This is additional setting for 'Night' scene mode */
 		case ISO_NIGHT: //Not support
-			s5k5ccgx_msg(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);	
+			s5k5ccgx_info(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);	
 		break;
 
 		case ISO_MOVIE: //Not support
-			s5k5ccgx_msg(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);	
+			s5k5ccgx_info(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);	
 		break;
 		
 		default:
-			s5k5ccgx_msg(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);
+			s5k5ccgx_info(&client->dev, "%s: failed: to set_iso, enum: %d\n", __func__, ctrl->value);
 			return -EINVAL;
 		break;
 	}
@@ -2167,7 +2157,7 @@ static int s5k5ccgx_set_iso(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 		return -EIO;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: done, to set_iso, enum: %d\n", __func__, ctrl->value);
+	s5k5ccgx_info(&client->dev, "%s: done, to set_iso, enum: %d\n", __func__, ctrl->value);
 
 	return 0;
 }
@@ -2244,7 +2234,7 @@ static int s5k5ccgx_set_touch_auto_focus(struct v4l2_subdev *sd, struct v4l2_con
 	width = s5k5ccgx_framesize_list[index].width;
 	height = s5k5ccgx_framesize_list[index].height;
 
-	s5k5ccgx_msg(&client->dev, "%s: touch position(%d, %d), preview size(%d, %d)\n", __func__,x,y,width,height);
+	s5k5ccgx_info(&client->dev, "%s: touch position(%d, %d), preview size(%d, %d)\n", __func__,x,y,width,height);
 
 	/* get start x position */
 	if (x <= OUTER_WINDOW_WIDTH/2)
@@ -2296,7 +2286,7 @@ static int s5k5ccgx_set_touch_auto_focus(struct v4l2_subdev *sd, struct v4l2_con
 		second_y = y - INNER_WINDOW_HEIGHT/2 ;
 	}
 	
-	s5k5ccgx_msg(&client->dev, "%s: first(%d, %d), second(%d, %d)\n", __func__,first_x,first_y,second_x,second_y);
+	s5k5ccgx_info(&client->dev, "%s: first(%d, %d), second(%d, %d)\n", __func__,first_x,first_y,second_x,second_y);
 	
 	if(ctrl->value == TOUCH_AF_START)
 	{
@@ -2311,8 +2301,8 @@ static int s5k5ccgx_set_touch_auto_focus(struct v4l2_subdev *sd, struct v4l2_con
 		S5K5CCGX_TOUCH_AF[10].val = INNER_WINDOW_HEIGHT*1024 /height;
 	}
 
-	s5k5ccgx_msg(&client->dev, "%s: fisrt reg(0x%x, 0x%x, 0x%x, 0x%x)\n", __func__,S5K5CCGX_TOUCH_AF[3].val,S5K5CCGX_TOUCH_AF[4].val,S5K5CCGX_TOUCH_AF[5].val,S5K5CCGX_TOUCH_AF[6].val);
-	s5k5ccgx_msg(&client->dev, "%s: second reg(0x%x, 0x%x, 0x%x, 0x%x)\n", __func__,S5K5CCGX_TOUCH_AF[7].val,S5K5CCGX_TOUCH_AF[8].val,S5K5CCGX_TOUCH_AF[9].val,S5K5CCGX_TOUCH_AF[10].val);
+	s5k5ccgx_info(&client->dev, "%s: fisrt reg(0x%x, 0x%x, 0x%x, 0x%x)\n", __func__,S5K5CCGX_TOUCH_AF[3].val,S5K5CCGX_TOUCH_AF[4].val,S5K5CCGX_TOUCH_AF[5].val,S5K5CCGX_TOUCH_AF[6].val);
+	s5k5ccgx_info(&client->dev, "%s: second reg(0x%x, 0x%x, 0x%x, 0x%x)\n", __func__,S5K5CCGX_TOUCH_AF[7].val,S5K5CCGX_TOUCH_AF[8].val,S5K5CCGX_TOUCH_AF[9].val,S5K5CCGX_TOUCH_AF[10].val);
 
 	for (i=0 ; i <s5k5ccgx_len_set_touch_af; i++) 
 	{
@@ -2330,7 +2320,7 @@ static int s5k5ccgx_set_touch_auto_focus(struct v4l2_subdev *sd, struct v4l2_con
 	else
 		stop_af_operation = 0;
 	
-	s5k5ccgx_msg(&client->dev, "%s: done\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: done\n", __func__);
 
 	return 0;
 }
@@ -2343,11 +2333,11 @@ static int s5k5ccgx_set_auto_focus(struct v4l2_subdev *sd, struct v4l2_control *
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 
 	//AF_Start
-	//s5k5ccgx_msg(&client->dev, "%s:s5k5ccgx_Single_AF_Start Setting~~~~ \n", __func__);
+	//s5k5ccgx_info(&client->dev, "%s:s5k5ccgx_Single_AF_Start Setting~~~~ \n", __func__);
 
 	if (ctrl->value == 1)
 	{	
-		s5k5ccgx_msg(&client->dev, "%s:s5k5ccgx_Single_AF_Start ~~~~ \n", __func__);
+		s5k5ccgx_info(&client->dev, "%s:s5k5ccgx_Single_AF_Start ~~~~ \n", __func__);
 		
 		af_operation_status = 1; // AF start
 
@@ -2386,7 +2376,7 @@ static int s5k5ccgx_set_auto_focus(struct v4l2_subdev *sd, struct v4l2_control *
 	else 
 	{
 
-		s5k5ccgx_msg(&client->dev, "%s: af_operation_status = %d, stop_af_operation = %d  \n", __func__, af_operation_status,stop_af_operation);
+		s5k5ccgx_info(&client->dev, "%s: af_operation_status = %d, stop_af_operation = %d  \n", __func__, af_operation_status,stop_af_operation);
 
 		if(af_operation_status == 1) //AF \C1\F8\C7\E0\C1\DF
 		{
@@ -2395,7 +2385,7 @@ static int s5k5ccgx_set_auto_focus(struct v4l2_subdev *sd, struct v4l2_control *
 		else
 			stop_af_operation = 0;
 		
-		s5k5ccgx_msg(&client->dev, "%s:s5k5ccgx_Single_AF_Cancel~~~~ \n", __func__);
+		s5k5ccgx_info(&client->dev, "%s:s5k5ccgx_Single_AF_Cancel~~~~ \n", __func__);
 		err = s5k5ccgx_i2c_write_block(sd,S5K5CCGX_AF_OFF,S5K5CCGX_AF_OFF_INDEX,"S5K5CCGX_AF_OFF");
 
 		err = s5k5ccgx_set_ae_awb(sd, AE_UNLOCK_AWB_UNLOCK);
@@ -2444,10 +2434,10 @@ static int s5k5ccgx_get_auto_focus_status(struct v4l2_subdev *sd, struct v4l2_co
 		err=s5k5ccgx_i2c_write(client,0x002E, 0x2D12);
 		err=s5k5ccgx_i2c_read(client, 0x0F12, &read_value);
 		if(err < 0){
-			s5k5ccgx_msg(&client->dev, "%s: failed: s5k5ccgx_get_auto_focus_status\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: failed: s5k5ccgx_get_auto_focus_status\n", __func__);
 		      	 return -EIO;
 			}
-		s5k5ccgx_msg(&client->dev, "%s: i2c_read --- read_value == 0x%x \n", __func__, read_value);	
+		s5k5ccgx_info(&client->dev, "%s: i2c_read --- read_value == 0x%x \n", __func__, read_value);	
 
 		if(read_value == 0x0001) //  in case 4sec, it's fail
 		{
@@ -2505,10 +2495,10 @@ static int s5k5ccgx_get_auto_focus_status(struct v4l2_subdev *sd, struct v4l2_co
 		err=s5k5ccgx_i2c_write(client,0x002E, 0x1F2F);
 		err=s5k5ccgx_i2c_read(client, 0x0F12, &read_value2);
 		if(err < 0){
-			s5k5ccgx_msg(&client->dev, "%s: failed: s5k5ccgx_get_auto_focus_status\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: failed: s5k5ccgx_get_auto_focus_status\n", __func__);
 		      	 return -EIO;
 			}
-		s5k5ccgx_msg(&client->dev, "%s: i2c_read --- read_value2 == 0x%x \n", __func__, read_value2);	
+		s5k5ccgx_info(&client->dev, "%s: i2c_read --- read_value2 == 0x%x \n", __func__, read_value2);	
 	}while(read_value2&0x0100);
 	
 	//idle 		0x0000
@@ -2539,7 +2529,7 @@ static int s5k5ccgx_get_auto_focus_status(struct v4l2_subdev *sd, struct v4l2_co
 	af_operation_status = 3; // AF finish
 	
 	ctrl->value = s5k5ccgx_buf_get_af_status[0];
-	s5k5ccgx_msg(&client->dev, "%s: i2c_read --- s5k5ccgx_buf_get_af_status[0] == 0x%x \n", __func__, s5k5ccgx_buf_get_af_status[0]);
+	s5k5ccgx_info(&client->dev, "%s: i2c_read --- s5k5ccgx_buf_get_af_status[0] == 0x%x \n", __func__, s5k5ccgx_buf_get_af_status[0]);
 	return 0;
 }
 
@@ -2560,7 +2550,7 @@ static int s5k5ccgx_get_iso(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 	else if ( 640 <= read_value  && read_value < 896 ) ctrl->value=200;
 	else ctrl->value=400;
 
-	s5k5ccgx_msg(&client->dev, "%s: camera ISO == %d \n", __func__, ctrl->value);
+	s5k5ccgx_info(&client->dev, "%s: camera ISO == %d \n", __func__, ctrl->value);
 
 	return err;
 }
@@ -2581,7 +2571,7 @@ static int s5k5ccgx_get_shutterspeed(struct v4l2_subdev *sd, struct v4l2_control
 	if(ctrl->value == 0) //if "ctrl->value" value is 0, do not working EXIF info
 		ctrl->value = 1;
 
-	s5k5ccgx_msg(&client->dev, "%s: camera shutterspeed == %d \n", __func__, ctrl->value/400);	
+	s5k5ccgx_info(&client->dev, "%s: camera shutterspeed == %d \n", __func__, ctrl->value/400);	
 
 	return err;
 }
@@ -2792,7 +2782,7 @@ static int s5k5ccgx_s_mbus_fmt(struct v4l2_subdev *sd,
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 	int framesize_index = -1;
 
-	s5k5ccgx_msg(&client->dev, "%s\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s\n", __func__);
 
 	if (fmt->code == V4L2_MBUS_FMT_FIXED &&
 			fmt->colorspace != V4L2_COLORSPACE_JPEG) {
@@ -2820,7 +2810,7 @@ static int s5k5ccgx_s_mbus_fmt(struct v4l2_subdev *sd,
 
 	framesize_index = s5k5ccgx_get_framesize_index(sd);
 
-	s5k5ccgx_msg(&client->dev, "%s:framesize_index = %d\n", __func__, framesize_index);
+	s5k5ccgx_info(&client->dev, "%s:framesize_index = %d\n", __func__, framesize_index);
 	
 	err = s5k5ccgx_set_framesize_index(sd, framesize_index);
 	if(err < 0){
@@ -3023,7 +3013,7 @@ static int s5k5ccgx_set_framesize_index(struct v4l2_subdev *sd, unsigned int ind
 			state->framesize_index = index; 
 			state->pix.width = s5k5ccgx_framesize_list[i].width;
 			state->pix.height = s5k5ccgx_framesize_list[i].height;
-			s5k5ccgx_msg(&client->dev, "%s: Camera Res: %dx%d\n", __func__, state->pix.width, state->pix.height);
+			s5k5ccgx_info(&client->dev, "%s: Camera Res: %dx%d\n", __func__, state->pix.width, state->pix.height);
 			return 0;
 		} 
 	} 
@@ -3080,110 +3070,110 @@ static int s5k5ccgx_g_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 		break;
 
 	case V4L2_CID_CAM_JPEG_MAIN_SIZE:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_JPEG_MAIN_SIZE\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_JPEG_MAIN_SIZE\n", __func__);
 		ctrl->value = state->jpeg.main_size;
 		err = 0;
 		break;
 	
 	case V4L2_CID_CAM_JPEG_MAIN_OFFSET:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_JPEG_MAIN_OFFSET\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_JPEG_MAIN_OFFSET\n", __func__);
 		ctrl->value = state->jpeg.main_offset;
 		err = 0;
 		break;
 
 	case V4L2_CID_CAM_JPEG_THUMB_SIZE:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_JPEG_THUMB_SIZE\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_JPEG_THUMB_SIZE\n", __func__);
 		ctrl->value = state->jpeg.thumb_size;
 		err = 0;
 		break;
 	
 	case V4L2_CID_CAM_JPEG_THUMB_OFFSET:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_JPEG_THUMB_OFFSET\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_JPEG_THUMB_OFFSET\n", __func__);
 		ctrl->value = state->jpeg.thumb_offset;
 		err = 0;
 		break;
 
 	case V4L2_CID_CAM_JPEG_POSTVIEW_OFFSET:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_JPEG_POSTVIEW_OFFSET\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_JPEG_POSTVIEW_OFFSET\n", __func__);
 		ctrl->value = state->jpeg.postview_offset;
 		err = 0;
 		break; 
 	
 	case V4L2_CID_CAM_JPEG_MEMSIZE:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_JPEG_MEMSIZE\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_JPEG_MEMSIZE\n", __func__);
 		ctrl->value = SENSOR_JPEG_SNAPSHOT_MEMSIZE;
 		err = 0;
 		break;
 
 	case V4L2_CID_CAM_JPEG_QUALITY:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_JPEG_QUALITY\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_JPEG_QUALITY\n", __func__);
 		err = 0;
 		break;
 
 	case V4L2_CID_CAMERA_OBJ_TRACKING_STATUS:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_OBJ_TRACKING_STATUS\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_OBJ_TRACKING_STATUS\n", __func__);
 		err = 0;
 		break;
 
 	case V4L2_CID_CAMERA_SMART_AUTO_STATUS:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_SMART_AUTO_STATUS\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SMART_AUTO_STATUS\n", __func__);
 		break;
 
 	case V4L2_CID_CAMERA_AUTO_FOCUS_RESULT_FIRST:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_AUTO_FOCUS_RESULT\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_AUTO_FOCUS_RESULT\n", __func__);
 		err = s5k5ccgx_get_auto_focus_status(sd, ctrl);
 		//ctrl->value = 0x01;
 		err = 0;
 		break;
 
 	case V4L2_CID_CAM_DATE_INFO_YEAR:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_DATE_INFO_YEAR\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_DATE_INFO_YEAR\n", __func__);
 		err = 0;
 		break; 
 
 	case V4L2_CID_CAM_DATE_INFO_MONTH:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_DATE_INFO_MONTH\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_DATE_INFO_MONTH\n", __func__);
 		err = 0;
 		break; 
 
 	case V4L2_CID_CAM_DATE_INFO_DATE:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_DATE_INFO_DATE\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_DATE_INFO_DATE\n", __func__);
 		err = 0;
 		break; 
 
 	case V4L2_CID_CAM_SENSOR_VER:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_SENSOR_VER\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_SENSOR_VER\n", __func__);
 		err = 0;
 		break; 
 
 	case V4L2_CID_CAM_FW_MINOR_VER:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_FW_MINOR_VER\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_FW_MINOR_VER\n", __func__);
 		err = 0;
 		break; 
 
 	case V4L2_CID_CAM_FW_MAJOR_VER:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_FW_MAJOR_VER\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_FW_MAJOR_VER\n", __func__);
 		err = 0;
 		break; 
 
 	case V4L2_CID_CAM_PRM_MINOR_VER:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_PRM_MINOR_VER\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_PRM_MINOR_VER\n", __func__);
 		err = 0;
 		break; 
 
 	case V4L2_CID_CAM_PRM_MAJOR_VER:
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_PRM_MAJOR_VER\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_PRM_MAJOR_VER\n", __func__);
 		err = 0;
 		break; 
 
 	case V4L2_CID_CAMERA_GET_FLASH_ONOFF:
 		ctrl->value = state->flash_state_on_previous_capture;
-		s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_FLASH_ONOFF\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_GET_FLASH_ONOFF\n", __func__);
 		err = 0;
 		break; 
 
 	default:
-		s5k5ccgx_msg(&client->dev, "%s: no such ctrl\n", __func__);
+		s5k5ccgx_info(&client->dev, "%s: no such ctrl\n", __func__);
 		break;
 	}
 	
@@ -3217,59 +3207,60 @@ static int s5k5ccgx_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 	{
 		case V4L2_CID_CAMERA_VT_MODE:
 			state->vt_mode = ctrl->value;
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_VT_MODE : state->vt_mode %d \n", __func__, state->vt_mode);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_VT_MODE : state->vt_mode %d \n", __func__, state->vt_mode);
 			break;
 		
 		case V4L2_CID_CAMERA_AEAWB_LOCK_UNLOCK:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_AEAWB_LOCK_UNLOCK\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_AEAWB_LOCK_UNLOCK\n", __func__);
 			err = s5k5ccgx_set_ae_awb(sd, ctrl->value);
 			break;
 		
 		case V4L2_CID_CAMERA_FLASH_MODE:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_FLASH_MODE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_FLASH_MODE\n", __func__);
 			flash_mode = ctrl->value;
+			s5k5ccgx_set_flash_mode(sd,103,true);
 			break;
 
 		case V4L2_CID_CAMERA_BRIGHTNESS:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_BRIGHTNESS\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_BRIGHTNESS\n", __func__);
 			err = s5k5ccgx_set_ev(sd, ctrl);
 			break;
 
 		case V4L2_CID_CAMERA_WHITE_BALANCE:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_AUTO_WHITE_BALANCE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_AUTO_WHITE_BALANCE\n", __func__);
 			state->wb = ctrl->value;
 			err = s5k5ccgx_set_white_balance(sd, ctrl);
 			break;
 
 		case V4L2_CID_CAMERA_EFFECT:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_EFFECT\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_EFFECT\n", __func__);
 			err =s5k5ccgx_set_effect(sd, ctrl);
 			break;
 
 		case V4L2_CID_CAMERA_ISO:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_ISO\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_ISO\n", __func__);
 			/* VENTURI_EUR (taejin.hyeon) 2011.02.21. add iso func*/
 			err =s5k5ccgx_set_iso(sd, ctrl);
 			/* VENTURI_EUR (taejin.hyeon) 2011.02.21. end */
 			break;
 
 		case V4L2_CID_CAMERA_METERING:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_METERING\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_METERING\n", __func__);
 			err =s5k5ccgx_set_metering(sd, ctrl);
 			break;
 
 		case V4L2_CID_CAMERA_CONTRAST:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_CONTRAST\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_CONTRAST\n", __func__);
 			err = s5k5ccgx_set_contrast(sd, ctrl);
 			break;
 
 		case V4L2_CID_CAMERA_SATURATION:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_SATURATION\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SATURATION\n", __func__);
 			err =s5k5ccgx_set_saturation(sd, ctrl);
 			break;
 
 		case V4L2_CID_CAMERA_SHARPNESS:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_SHARPNESS\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SHARPNESS\n", __func__);
 			err = s5k5ccgx_set_sharpness(sd, ctrl);
 			break;
 
@@ -3283,41 +3274,41 @@ static int s5k5ccgx_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 			break;
 
 		case V4L2_CID_CAMERA_WDR: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_WDR\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_WDR\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_ANTI_SHAKE: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_ANTI_SHAKE\n", __func__);;
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_ANTI_SHAKE\n", __func__);;
 			break;
 
 		case V4L2_CID_CAMERA_FACE_DETECTION: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_FACE_DETECTION\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_FACE_DETECTION\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_SMART_AUTO: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_SMART_AUTO\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SMART_AUTO\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_FOCUS_MODE:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_FOCUS_MODE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_FOCUS_MODE\n", __func__);
 			state->focus_mode = ctrl->value;
 			err = s5k5ccgx_set_focus_mode(sd, state->focus_mode);
 			break;
 			
 		case V4L2_CID_CAMERA_VINTAGE_MODE: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_VINTAGE_MODE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_VINTAGE_MODE\n", __func__);
 			break;
 			
 		case V4L2_CID_CAMERA_BEAUTY_SHOT: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_BEAUTY_SHOT\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_BEAUTY_SHOT\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_FACEDETECT_LOCKUNLOCK: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_FACEDETECT_LOCKUNLOCK\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_FACEDETECT_LOCKUNLOCK\n", __func__);
 			break;
 
 		case V4L2_CID_CAM_JPEG_QUALITY:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_JPEG_QUALITY\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_JPEG_QUALITY\n", __func__);
 			if(ctrl->value < 0 || ctrl->value > 100)
 			{
 				err = -EINVAL;
@@ -3330,89 +3321,89 @@ static int s5k5ccgx_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 			break;
 
 		case V4L2_CID_CAMERA_SCENE_MODE:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_SCENE_MODE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SCENE_MODE\n", __func__);
 			state->scenemode = ctrl->value;
 			err = s5k5ccgx_change_scene_mode(sd, ctrl);
 			//err = s5k5ccgx_set_preview_start(sd); //temp for LSI
 			break;
 
 		case V4L2_CID_CAMERA_GPS_LATITUDE: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_GPS_LATITUDE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_GPS_LATITUDE\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_GPS_LONGITUDE: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_GPS_LONGITUDE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_GPS_LONGITUDE\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_GPS_TIMESTAMP: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_GPS_TIMESTAMP\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_GPS_TIMESTAMP\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_GPS_ALTITUDE: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_GPS_ALTITUDE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_GPS_ALTITUDE\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_ZOOM: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_ZOOM\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_ZOOM\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_TOUCH_AF_START_STOP: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_TOUCH_AF_START_STOP\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_TOUCH_AF_START_STOP\n", __func__);
 			err = s5k5ccgx_set_touch_auto_focus(sd, ctrl);
 			break;
 			
 		case V4L2_CID_CAMERA_CAF_START_STOP: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_CAF_START_STOP\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_CAF_START_STOP\n", __func__);
 			break;	
 
 		case V4L2_CID_CAMERA_OBJECT_POSITION_X: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_OBJECT_POSITION_X\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_OBJECT_POSITION_X\n", __func__);
 			state->position.x = ctrl->value;
 			break;
 
 		case V4L2_CID_CAMERA_OBJECT_POSITION_Y: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_OBJECT_POSITION_Y\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_OBJECT_POSITION_Y\n", __func__);
 			state->position.y = ctrl->value;
 			break;
 
 		case V4L2_CID_CAMERA_OBJ_TRACKING_START_STOP:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_OBJ_TRACKING_START_STOP\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_OBJ_TRACKING_START_STOP\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_SET_AUTO_FOCUS:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_SET_AUTO_FOCUS\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SET_AUTO_FOCUS\n", __func__);
 			err = s5k5ccgx_set_auto_focus(sd, ctrl);
 			break;		
 
 		case V4L2_CID_CAMERA_FRAME_RATE:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_FRAME_RATE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_FRAME_RATE\n", __func__);
 			//err = s5k5ccgx_set_frame_rate(sd, ctrl);
 			state->fps = ctrl->value;	
 			break;
 			
 		case V4L2_CID_CAMERA_ANTI_BANDING: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_ANTI_BANDING\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_ANTI_BANDING\n", __func__);
 			break;
 			
 		case V4L2_CID_CAMERA_SET_GAMMA: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_SET_GAMMA\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SET_GAMMA\n", __func__);
 			break;
 		
 		case V4L2_CID_CAMERA_SET_SLOW_AE: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_SET_SLOW_AE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SET_SLOW_AE\n", __func__);
 			break;
 			
 		case V4L2_CID_CAMERA_BATCH_REFLECTION: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_BATCH_REFLECTION\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_BATCH_REFLECTION\n", __func__);
 			break;
 
 		case V4L2_CID_CAM_CAPTURE:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_CAPTURE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_CAPTURE\n", __func__);
 			err = s5k5ccgx_set_capture_start(sd, ctrl);
 			break;
 		
 		case V4L2_CID_CAM_PREVIEW_ONOFF:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_PREVIEW_ONOFF\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_PREVIEW_ONOFF\n", __func__);
 			if(ctrl->value)
 				err = s5k5ccgx_set_preview_start(sd);
 			else
@@ -3420,48 +3411,48 @@ static int s5k5ccgx_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 			break;
 
 		case V4L2_CID_CAM_UPDATE_FW: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_UPDATE_FW\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_UPDATE_FW\n", __func__);
 			break;
 
 		case V4L2_CID_CAM_SET_FW_ADDR: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_SET_FW_ADDR\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_SET_FW_ADDR\n", __func__);
 			break;
 
 		case V4L2_CID_CAM_SET_FW_SIZE: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_SET_FW_SIZE\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_SET_FW_SIZE\n", __func__);
 			break;
 
 		case V4L2_CID_CAM_FW_VER: //NOT SUPPORT
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAM_FW_VER\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAM_FW_VER\n", __func__);
 			break;
 
 		case V4L2_CID_CAMERA_GET_ISO:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_GET_ISO\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_GET_ISO\n", __func__);
 			err = s5k5ccgx_get_iso(sd, ctrl); 	
 			break;
 		
 		case V4L2_CID_CAMERA_GET_SHT_TIME:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_GET_SHT_TIME\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_GET_SHT_TIME\n", __func__);
 			err = s5k5ccgx_get_shutterspeed(sd, ctrl);		
 			break;	
 
 		case V4L2_CID_CAMERA_RESET:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_RESET \n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_RESET \n", __func__);
 			err = s5k5ccgx_reset(sd);
 			break;
 
 		case V4L2_CID_CAMERA_CHECK_DATALINE:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_CHECK_DATALINE \n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_CHECK_DATALINE \n", __func__);
 			state->check_dataline = ctrl->value;
 			break;	
 
 		case V4L2_CID_CAMERA_CHECK_DATALINE_STOP:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_CHECK_DATALINE_STOP \n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_CHECK_DATALINE_STOP \n", __func__);
 			err=s5k5ccgx_check_dataline_stop(sd);
 			break;
 			
 		case V4L2_CID_CAMERA_SET_FLASH:
-			s5k5ccgx_msg(&client->dev, "%s: V4L2_CID_CAMERA_FLASH_ONOFF\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: V4L2_CID_CAMERA_SET_FLASH\n", __func__);
 			#ifdef S5K5CCGX_FLASH_SUPPORT
 			err=s5k5ccgx_set_flash_start_end(sd, ctrl);
 			#else
@@ -3472,7 +3463,7 @@ static int s5k5ccgx_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 		
 
 		default:
-			s5k5ccgx_msg(&client->dev, "%s: no support control in camera sensor, S5K5CCGX\n", __func__);
+			s5k5ccgx_info(&client->dev, "%s: no support control in camera sensor, S5K5CCGX\n", __func__);
 			err = 0;
 			break;
 			
@@ -3484,7 +3475,7 @@ static int s5k5ccgx_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 		return 0;
 
 out:
-	s5k5ccgx_msg(&client->dev, "%s: vidioc_s_ctrl failed\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s: vidioc_s_ctrl failed\n", __func__);
 	return err;
 }
 
@@ -3521,7 +3512,7 @@ static int s5k5ccgx_init(struct v4l2_subdev *sd, u32 val)
 	int err = -EINVAL;
 	unsigned short read_value;
 
-	s5k5ccgx_msg(&client->dev, "%s\n", __func__);
+	s5k5ccgx_info(&client->dev, "%s\n", __func__);
 
 	CamTunningStatus = s5k5ccgx_regs_table_init();
 	err = CamTunningStatus;
@@ -3535,7 +3526,7 @@ static int s5k5ccgx_init(struct v4l2_subdev *sd, u32 val)
 	err=s5k5ccgx_i2c_write(client,0xFCFC, 0xD000);
 	if (err < 0) {
 		//This is preview fail 
-		s5k5ccgx_msg(&client->dev, "%s: camera initialization failed. err(%d)\n", \
+		s5k5ccgx_info(&client->dev, "%s: camera initialization failed. err(%d)\n", \
 			__func__, err);
 		i2c_fail_check = -1; //I2C fail
 		return -EIO;	/* FIXME */	
@@ -3544,13 +3535,13 @@ static int s5k5ccgx_init(struct v4l2_subdev *sd, u32 val)
 	err=s5k5ccgx_i2c_write(client,0x002E, 0x0040);
 	err=s5k5ccgx_i2c_read(client, 0x0F12, &read_value);
 
-	s5k5ccgx_msg(&client->dev, "%s: camera version == 0x%x \n", __func__, read_value);	
+	s5k5ccgx_info(&client->dev, "%s: camera version == 0x%x \n", __func__, read_value);	
 	if(state->vt_mode == 0)
 	{
 		err = s5k5ccgx_i2c_write_block(sd, S5K5CCGX_INIT_SET,S5K5CCGX_INIT_SET_INDEX,"S5K5CCGX_INIT_SET");
 		if (err < 0) {
 			//This is preview fail 
-			s5k5ccgx_msg(&client->dev, "%s: camera initialization(S5K5CCGX_INIT_SET) failed. err(%d)\n", \
+			s5k5ccgx_info(&client->dev, "%s: camera initialization(S5K5CCGX_INIT_SET) failed. err(%d)\n", \
 				__func__, state->check_previewdata);
 			return -EIO;	/* FIXME */	
 		}
@@ -3560,7 +3551,7 @@ static int s5k5ccgx_init(struct v4l2_subdev *sd, u32 val)
 		err = s5k5ccgx_i2c_write_block(sd, S5K5CCGX_INIT_VT_SET,S5K5CCGX_INIT_VT_SET_INDEX,"S5K5CCGX_INIT_VT_SET");		
 		if (err < 0) {
 			//This is preview fail 
-			s5k5ccgx_msg(&client->dev, "%s: camera initialization(S5K5CCGX_INIT_VT_SET) failed. err(%d)\n", \
+			s5k5ccgx_info(&client->dev, "%s: camera initialization(S5K5CCGX_INIT_VT_SET) failed. err(%d)\n", \
 				__func__, state->check_previewdata);
 			return -EIO;	/* FIXME */	
 		}
