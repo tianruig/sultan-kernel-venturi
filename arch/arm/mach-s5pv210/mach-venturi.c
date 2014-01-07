@@ -352,7 +352,7 @@ static struct s3cfb_lcd hx8369 = {
 						 (CONFIG_FB_S3C_NUM_OVLY_WIN * \
 						  CONFIG_FB_S3C_NUM_BUF_OVLY_WIN)))
 // Was 8M, but we're only using it to encode VGA jpegs
-#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (4096 * SZ_1K)
+#define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (916 * SZ_1K)
 #define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM (2048 * SZ_1K)
 #define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM_GPU1 (3072 * SZ_1K)
 #define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM_ADSP (1512 * SZ_1K)
@@ -3408,10 +3408,10 @@ static struct s3c_platform_fimc fimc_plat_lsi = {
 
 #ifdef CONFIG_VIDEO_JPEG_V2
 static struct s3c_platform_jpeg jpeg_plat __initdata = {
-	.max_main_width	= 800,
+	.max_main_width		= 640,
 	.max_main_height	= 480,
-	.max_thumb_width	= 320,
-	.max_thumb_height	= 240,
+	.max_thumb_width	= 0,
+	.max_thumb_height	= 0,
 };
 #endif
 
