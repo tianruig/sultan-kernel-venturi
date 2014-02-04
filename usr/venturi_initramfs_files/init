@@ -40,8 +40,6 @@ fi
 umount /sys
 umount /proc
 
-date >> /boot.txt
-
 mount -t vfat /dev/block/mmcblk0p17 /emmc
 cp /boot.txt /emmc/boot.txt
 umount /emmc
