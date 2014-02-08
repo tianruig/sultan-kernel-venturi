@@ -4988,7 +4988,7 @@ static inline void init_performance_values(void)
 		rung->cover_msecs = preset->cover_msecs[i];
 	}
 
-	uksm_max_cpu_percentage = preset->max_cpu;
+	uksm_max_cpu_percentage = 25;
 }
 
 static ssize_t cpu_governor_store(struct kobject *kobj,
