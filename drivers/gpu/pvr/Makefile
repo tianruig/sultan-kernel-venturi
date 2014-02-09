@@ -1,4 +1,18 @@
-ccflags-y := -Ofast -ffast-math -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mvectorize-with-neon-double
+ccflags-y := \
+	-Wno-pointer-sign\
+	-fno-strict-overflow\
+	-fconserve-stack\
+	-Wdeclaration-after-statement\
+	-Wpointer-arith\
+	-Wmissing-format-attribute\
+	-Wno-format-zero-length\
+	-Wmissing-prototypes\
+	-Wstrict-prototypes\
+	-Wno-unused-parameter\
+	-Wno-sign-compare\
+	-fno-strict-aliasing\
+	-Wno-pointer-arith\
+	-Ofast
 
 ccflags-y += -DLINUX -D__linux__ -DANDROID
 ccflags-y += -Idrivers/gpu/pvr
