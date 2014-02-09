@@ -1,4 +1,4 @@
-ccflags-y := -Ofast -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mvectorize-with-neon-single
+ccflags-y := -Ofast -ffast-math -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mvectorize-with-neon-double
 
 ccflags-y += -DLINUX -D__linux__ -DANDROID
 ccflags-y += -Idrivers/gpu/pvr
