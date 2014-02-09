@@ -67,9 +67,6 @@
 #include <linux/reboot.h>
 #include <linux/wlan_plat.h>
 
-#ifdef CONFIG_ANDROID_PMEM
-#include <linux/android_pmem.h>
-#endif
 #include <plat/media.h>
 #include <mach/media.h>
 
@@ -353,9 +350,6 @@ static struct s3cfb_lcd hx8369 = {
 						  CONFIG_FB_S3C_NUM_BUF_OVLY_WIN)))
 // Was 8M, but we're only using it to encode VGA jpegs
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_JPEG (916 * SZ_1K)
-#define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM (2048 * SZ_1K)
-#define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM_GPU1 (3072 * SZ_1K)
-#define  S5PV210_ANDROID_PMEM_MEMSIZE_PMEM_ADSP (1512 * SZ_1K)
 #define  S5PV210_VIDEO_SAMSUNG_MEMSIZE_TEXTSTREAM (1024 * SZ_1K)
 
 
@@ -3783,68 +3777,6 @@ static struct platform_device ram_console_device = {
 	.resource = ram_console_resource,
 };
 
-#ifdef CONFIG_ANDROID_PMEM
-static struct android_pmem_platform_data pmem_pdata = {
-	.name = "pmem",
-	.no_allocator = 1,
-	.cached = 1,
-	.start = 0,
-	.size = 0,
-};
-
-static struct android_pmem_platform_data pmem_gpu1_pdata = {
-	.name = "pmem_gpu1",
-	.no_allocator = 1,
-	.cached = 1,
-	.buffered = 1,
-	.start = 0,
-	.size = 0,
-};
-
-static struct android_pmem_platform_data pmem_adsp_pdata = {
-	.name = "pmem_adsp",
-	.no_allocator = 1,
-	.cached = 1,
-	.buffered = 1,
-	.start = 0,
-	.size = 0,
-};
-
-static struct platform_device pmem_device = {
-	.name = "android_pmem",
-	.id = 0,
-	.dev = { .platform_data = &pmem_pdata },
-};
-
-static struct platform_device pmem_gpu1_device = {
-	.name = "android_pmem",
-	.id = 1,
-	.dev = { .platform_data = &pmem_gpu1_pdata },
-};
-
-static struct platform_device pmem_adsp_device = {
-	.name = "android_pmem",
-	.id = 2,
-	.dev = { .platform_data = &pmem_adsp_pdata },
-};
-
-static void __init android_pmem_set_platdata(void)
-{
-	pmem_pdata.start = (u32)s5p_get_media_memory_bank(S5P_MDEV_PMEM, 0);
-	pmem_pdata.size = (u32)s5p_get_media_memsize_bank(S5P_MDEV_PMEM, 0);
-
-	pmem_gpu1_pdata.start =
-		(u32)s5p_get_media_memory_bank(S5P_MDEV_PMEM_GPU1, 0);
-	pmem_gpu1_pdata.size =
-		(u32)s5p_get_media_memsize_bank(S5P_MDEV_PMEM_GPU1, 0);
-
-	pmem_adsp_pdata.start =
-		(u32)s5p_get_media_memory_bank(S5P_MDEV_PMEM_ADSP, 0);
-	pmem_adsp_pdata.size =
-		(u32)s5p_get_media_memsize_bank(S5P_MDEV_PMEM_ADSP, 0);
-}
-#endif
-
 #ifdef CONFIG_CPU_FREQ
 static struct s5pv210_cpufreq_voltage smdkc110_cpufreq_volt[] = {
 	{
@@ -4589,12 +4521,6 @@ static struct platform_device *aries_devices[] __initdata = {
 	&s5pv210_pd_mfc,
 #endif
 
-#ifdef CONFIG_ANDROID_PMEM
-	&pmem_device,
-	&pmem_gpu1_device,
-	&pmem_adsp_device,
-#endif
-
 #ifdef CONFIG_HAVE_PWM
 	&s3c_device_timer[0],
 	&s3c_device_timer[1],
@@ -4778,10 +4704,6 @@ static void __init aries_machine_init(void)
 
 	/*initialise the gpio's*/
 	config_init_gpio();
-
-#ifdef CONFIG_ANDROID_PMEM
-	android_pmem_set_platdata();
-#endif
 
 	/* i2c */
 	s3c_i2c0_set_platdata(NULL);
