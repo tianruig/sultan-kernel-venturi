@@ -245,8 +245,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fsingle-precision-constant -ftree-vectorize
-HOSTCXXFLAGS = -O2 -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mno-unaligned-access
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -ftree-vectorize -fomit-frame-pointer
+HOSTCXXFLAGS = -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mno-unaligned-access -mvectorize-with-neon-double
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -347,11 +347,12 @@ CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-CFLAGS_MODULE   =
-AFLAGS_MODULE   =
+MODFLAGS	= -DMODULE -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mno-unaligned-access -mvectorize-with-neon-double
+CFLAGS_MODULE   = $(MODFLAGS) -mno-unaligned-access
+AFLAGS_MODULE   = $(MODFLAGS) -mno-unaligned-access
 LDFLAGS_MODULE  = -T $(srctree)/scripts/module-common.lds
-CFLAGS_KERNEL	= -O2 -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mvectorize-with-neon-single -mno-unaligned-access
-AFLAGS_KERNEL	=
+CFLAGS_KERNEL	= -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mno-unaligned-access -mvectorize-with-neon-double
+AFLAGS_KERNEL	= -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mno-unaligned-access -mvectorize-with-neon-double
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 
@@ -362,16 +363,18 @@ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
                    $(if $(KBUILD_SRC), -I$(srctree)/include) \
                    -include include/generated/autoconf.h
 
-KBUILD_CPPFLAGS := -D__KERNEL__ -O2 -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mvectorize-with-neon-single -mno-unaligned-access
+KBUILD_CPPFLAGS := -D__KERNEL__ -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mno-unaligned-access -mvectorize-with-neon-double
 
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
 		   -fno-delete-null-pointer-checks
-KBUILD_AFLAGS_KERNEL :=
-KBUILD_CFLAGS_KERNEL := -O2 -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mvectorize-with-neon-single -mno-unaligned-access
+KBUILD_AFLAGS_KERNEL := -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mno-unaligned-access -mvectorize-with-neon-double
+KBUILD_CFLAGS_KERNEL := -O3 -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize -mno-unaligned-access -mvectorize-with-neon-double
 KBUILD_AFLAGS   := -D__ASSEMBLY__
+KBUILD_AFLAGS_MODULE  := -DMODULE -mno-unaligned-access -mvectorize-with-neon-double
+KBUILD_CFLAGS_MODULE  := -DMODULE -mno-unaligned-access -mvectorize-with-neon-double
 KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
 
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
@@ -556,6 +559,19 @@ endif # $(dot-config)
 # This allow a user to issue only 'make' to build a kernel including modules
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
+
+ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+KBUILD_CFLAGS	+= -Os -mno-unaligned-access -mvectorize-with-neon-double -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize
+endif
+ifdef CONFIG_CC_OPTIMIZE_DEFAULT
+KBUILD_CFLAGS	+= -O2 -mno-unaligned-access -mvectorize-with-neon-double -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize
+endif
+ifdef CONFIG_CC_OPTIMIZE_ALOT
+KBUILD_CFLAGS  += -O3 -mno-unaligned-access -mvectorize-with-neon-double -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize
+endif
+ifdef CONFIG_CC_OPTIMIZE_FAST
+KBUILD_CFLAGS  += -Ofast -mno-unaligned-access -mvectorize-with-neon-double -fgcse-lm -fgcse-sm -fsched-spec-load -fforce-addr -fsingle-precision-constant -mtune=cortex-a8 -marm -march=armv7-a -mfpu=neon -ftree-vectorize
+endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
