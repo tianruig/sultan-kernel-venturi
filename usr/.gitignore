@@ -10,3 +10,4 @@ initramfs_list
 include
 gen_init_cpio
 initramfs_data.cpio
+!param.bz2
