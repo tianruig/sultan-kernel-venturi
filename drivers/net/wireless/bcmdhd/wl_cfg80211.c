@@ -52,6 +52,7 @@
 #include <linux/wireless.h>
 #include <linux/ieee80211.h>
 #include <linux/wait.h>
+#include <linux/delay.h>
 #include <net/cfg80211.h>
 #include <net/rtnetlink.h>
 
@@ -4647,12 +4648,20 @@ s32 wl_mode_to_nl80211_iftype(s32 mode)
 static s32 wl_setup_wiphy(struct wireless_dev *wdev, struct device *sdiofunc_dev)
 {
 	s32 err = 0;
+	int tries = 0;
 	wdev->wiphy =
 	    wiphy_new(&wl_cfg80211_ops, sizeof(struct wl_priv));
-	if (unlikely(!wdev->wiphy)) {
+	while ((unlikely(!wdev->wiphy))) {
 		WL_ERR(("Couldn not allocate wiphy device\n"));
-		err = -ENOMEM;
-		return err;
+		if(tries > 5) {
+		
+			err = -ENOMEM;
+			return err;	
+		}
+		mdelay(100);
+		tries += 1;
+		wdev->wiphy =
+	    		wiphy_new(&wl_cfg80211_ops, sizeof(struct wl_priv));
 	}
 	set_wiphy_dev(wdev->wiphy, sdiofunc_dev);
 	wdev->wiphy->max_scan_ie_len = WL_SCAN_IE_LEN_MAX;
