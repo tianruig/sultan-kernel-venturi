@@ -446,6 +446,9 @@ static void fsa9480_detect_dev(struct fsa9480_usbsw *usbsw)
 		} else if (usbsw->dev2 & DEV_JIG_UART_ON) {
 			if (pdata->cardock_cb)
 				pdata->cardock_cb(FSA9480_DETACHED);
+		}else {
+			if (pdata->usb_cb && usbsw->is_usb_ready )
+				pdata->usb_cb(FSA9480_DETACHED);
 		}
 	}
 

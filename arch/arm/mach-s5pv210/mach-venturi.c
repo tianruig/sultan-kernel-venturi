@@ -845,7 +845,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 1667,  -70 }, 
 };
 struct max8998_charger_callbacks *charger_callbacks;
-static enum cable_type_t set_cable_status = CABLE_TYPE_NONE;
+static enum cable_type_t set_cable_status = CABLE_TYPE_USB;
 
 static void max8998_charger_register_callbacks(
 		struct max8998_charger_callbacks *ptr)
