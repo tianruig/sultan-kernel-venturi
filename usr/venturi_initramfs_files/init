@@ -6,13 +6,17 @@ set -x
 
 cd /
 rm /init
+EXEC=/init
 
-date >>/boot.txt
 exec >>/boot.txt 2>&1
 
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 mount -t ext4 /dev/block/mmcblk0p15 /cache
+
+#busybox date segfaults? so yeah.
+busybox cat /sys/devices/platform/s3c2410-rtc/rtc/rtc1/date
+busybox cat /sys/devices/platform/s3c2410-rtc/rtc/rtc1/time
 
 image=/stage1/boot.cpio
 
@@ -32,20 +36,22 @@ rm -rf /cache
 
 cpio -i < ${image}
 
-if grep -q 1 /sys/class/power_supply/battery/charging_mode_booting ; then
+busybox cat /sys/class/power_supply/battery/charging_mode_booting
+
+if test $(busybox cat /sys/class/power_supply/battery/charging_mode_booting) == 1 ; then
 	# low power mode
-	cp -f lpm.rc init.rc
+	cp -f lpm.rc init.venturi.rc
 fi
 
 umount /sys
 umount /proc
 
 mount -t vfat /dev/block/mmcblk0p17 /emmc
-cp /boot.txt /emmc/boot.txt
+busybox cat /boot.txt >> /emmc/boot.txt
 umount /emmc
 
 rm -rf /dev/* /stage1 /emmc
 
 export PATH="${_PATH}"
 
-exec /init
+exec $EXEC
