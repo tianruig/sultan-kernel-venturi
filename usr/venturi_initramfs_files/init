@@ -20,6 +20,14 @@ busybox cat /sys/devices/platform/s3c2410-rtc/rtc/rtc1/time
 
 image=/stage1/boot.cpio
 
+if test -e /cache/.rebooting ; then
+
+	rm -rf /cache/.rebooting
+
+	# disable lpm
+	echo 0 > /sys/class/power_supply/battery/charging_mode_booting
+fi
+
 if test -e /cache/.startrecovery || grep -q bootmode=2 /proc/cmdline ; then
 	# recovery boot so dd param.lfs to work around missing proprietary driver
 	bzcat /stage1/param.bz2 | dd of=/dev/block/mmcblk0p9
