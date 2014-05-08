@@ -30,6 +30,7 @@
 #include <linux/input.h>
 #include <linux/irq.h>
 #include <linux/skbuff.h>
+#include <linux/string.h>
 #ifdef CONFIG_FORCE_FAST_CHARGE
 #include <linux/fastchg.h>
 #endif
@@ -166,6 +167,8 @@ EXPORT_SYMBOL(sec_get_param_value);
 #define WLAN_SECTION_SIZE_3	(PREALLOC_WLAN_BUF_NUM * 1024)
 
 #define WLAN_SKB_BUF_NUM	17
+
+static char * wlan_mac = "00:90:4c:11:22:33";
 
 static struct sk_buff *wlan_static_skb[WLAN_SKB_BUF_NUM];
 
@@ -4380,11 +4383,60 @@ static void *aries_wifi_get_country_code(char *ccode)
 	return &aries_wifi_translate_custom_table[0];
 }
 
+
+module_param(wlan_mac, charp, 0664);
+
+static int *aries_wifi_get_mac_addr(unsigned char *buf)
+{
+	char octet0[3];
+	char octet1[3];
+	char octet2[3];
+	char octet3[3];
+	char octet4[3];
+	char octet5[3];
+
+	/* mac addr syntax checks i.e 00:11:22:33:44:55 */
+	if(wlan_mac && (strlen(wlan_mac) == 17) // Length must be 17
+	&& (wlan_mac[2] == 58) // check for colon (58) at these positions
+	&& (wlan_mac[5] == 58)
+	&& (wlan_mac[8] == 58)
+	&& (wlan_mac[11] == 58)
+	&& (wlan_mac[14] == 58)){
+
+		memcpy( octet0, &wlan_mac[0], 2 );
+		octet0[2] = '\0';
+		memcpy( octet1, &wlan_mac[3], 2 );
+		octet1[2] = '\0';
+		memcpy( octet2, &wlan_mac[6], 2 );
+		octet2[2] = '\0';
+		memcpy( octet3, &wlan_mac[9], 2 );
+		octet3[2] = '\0';
+		memcpy( octet4, &wlan_mac[12], 2 );
+		octet4[2] = '\0';
+		memcpy( octet5, &wlan_mac[15], 2 );
+		octet5[2] = '\0';
+		buf[0] = (int)simple_strtol(octet0,NULL,16);
+		buf[1] = (int)simple_strtol(octet1,NULL,16);
+		buf[2] = (int)simple_strtol(octet2,NULL,16);
+		buf[3] = (int)simple_strtol(octet3,NULL,16);
+		buf[4] = (int)simple_strtol(octet4,NULL,16);
+		buf[5] = (int)simple_strtol(octet5,NULL,16);
+	}
+	else
+	{
+		printk("%s: %d - %s is not a valid mac address\n",__func__,__LINE__, wlan_mac);
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
 static struct wifi_platform_data wifi_pdata = {
 	.set_power		= wlan_power_en,
 	.set_reset		= wlan_reset_en,
 	.set_carddetect		= wlan_carddetect_en,
 	.mem_prealloc		= aries_mem_prealloc,
+	.get_mac_addr		= aries_wifi_get_mac_addr,
 	.get_country_code	= aries_wifi_get_country_code,
 };
 

@@ -13,12 +13,17 @@ exec >>/boot.txt 2>&1
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 mount -t ext4 /dev/block/mmcblk0p15 /cache
+busybox mkdir /efs
+mount -t vfat /dev/block/mmcblk0p10 /efs
 
 #busybox date segfaults? so yeah.
 busybox cat /sys/devices/platform/s3c2410-rtc/rtc/rtc1/date
 busybox cat /sys/devices/platform/s3c2410-rtc/rtc/rtc1/time
 
 image=/stage1/boot.cpio
+
+# Set the wifi mac addr
+busybox printf "$(busybox cat /efs/imei/.nvmac.info)" > /sys/module/mach_venturi/parameters/wlan_mac
 
 if test -e /cache/.rebooting ; then
 
@@ -53,12 +58,13 @@ fi
 
 umount /sys
 umount /proc
+umount /efs
 
 mount -t vfat /dev/block/mmcblk0p17 /emmc
 busybox cat /boot.txt >> /emmc/boot.txt
 umount /emmc
 
-rm -rf /dev/* /stage1 /emmc
+rm -rf /dev/* /stage1 /emmc /efs
 
 export PATH="${_PATH}"
 
