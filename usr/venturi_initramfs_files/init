@@ -38,16 +38,22 @@ if test -e /cache/.startrecovery || grep -q bootmode=2 /proc/cmdline ; then
 	bzcat /stage1/param.bz2 | dd of=/dev/block/mmcblk0p9
 
 	rm -rf /cache/.startrecovery
-	image=/stage1/recovery.cpio
+
+	#load custom recovery ramdisk if it's there
+	if test -e /cache/custom_recovery/ramdisk-recovery.cpio ; then
+		image=/cache/custom_recovery/ramdisk-recovery.cpio
+	else
+		image=/stage1/recovery.cpio
+	fi
 
 	# disable lpm
 	echo 0 > /sys/class/power_supply/battery/charging_mode_booting
 fi
 
+cpio -i < ${image}
+
 umount /cache
 rm -rf /cache
-
-cpio -i < ${image}
 
 busybox cat /sys/class/power_supply/battery/charging_mode_booting
 
